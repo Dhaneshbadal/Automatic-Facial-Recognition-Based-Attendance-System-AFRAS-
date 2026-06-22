@@ -435,8 +435,7 @@ def session_summary(request, session_id):
     
     return render(request, 'dashboard/session_summary.html', context)
 
-# Video Processing (The Generator)
-# Video Processing (The Generator) - WITH CONSTANT FACE FRAMES
+
 # Video Processing (The Generator) - FIXED FOR IMMEDIATE RECOGNITION
 def gen_frames(session_id):
     import time
@@ -453,32 +452,68 @@ def gen_frames(session_id):
     session = AttendanceSession.objects.get(id=session_id)
     print(f"\n🎥 Starting video feed for session: {session.subject_name} (ID: {session_id})")
 
-    # Pre-fetch students
+    # ===== PRE-FETCH STUDENTS WITH FACE ENCODINGS =====
     students = Student.objects.exclude(face_encoding__isnull=True)
     print(f"👥 Students with face encodings: {students.count()}")
     
-    known_encodings = [np.array(s.face_encoding) for s in students]
-    student_ids = [s.id for s in students]
-    student_names = [s.full_name for s in students]
-    
-    # Create a dictionary for faster student lookup
-    student_dict = {s.id: s for s in students}
+    known_encodings = []
+    student_ids = []
+    student_names = []
+    student_dict = {}
 
-    # TRACKING STATE
+    for student in students:
+        try:
+            # Parse face encoding from database
+            face_enc = student.face_encoding
+            
+            # Convert to numpy array if needed
+            if isinstance(face_enc, list):
+                face_enc = np.array(face_enc)
+            elif isinstance(face_enc, str):
+                import json
+                try:
+                    face_enc = np.array(json.loads(face_enc))
+                except:
+                    try:
+                        import ast
+                        face_enc = np.array(ast.literal_eval(face_enc))
+                    except:
+                        continue
+            
+            # ===== FORMAT TO 6 DECIMAL PLACES =====
+            if isinstance(face_enc, np.ndarray):
+                # Format each value to 6 decimal places
+                formatted_enc = np.array([float(f"{float(x):.6f}") for x in face_enc], dtype=np.float64)
+                known_encodings.append(formatted_enc)
+                student_ids.append(student.id)
+                student_names.append(student.full_name)
+                student_dict[student.id] = student
+                print(f"✅ Loaded: {student.full_name} (Vector: {len(formatted_enc)})")
+        except Exception as e:
+            print(f"❌ Error loading {student.full_name}: {e}")
+            continue
+
+    print(f"✅ Successfully loaded {len(known_encodings)} students with valid face encodings")
+
+    if len(known_encodings) == 0:
+        print("❌ No valid face encodings found!")
+        camera.release()
+        yield (b"--frame\r\n"
+               b"Content-Type: text/plain\r\n\r\n"
+               b"No face encodings available. Please register students first.\r\n")
+        return
+
+    # ===== TRACKING STATE =====
     tracked_faces = {}
     next_face_id = 0
     face_tracking_threshold = 2.0
-    
-    # Track which students have been logged to avoid duplicate DB hits
-    logged_students = set()  # Student IDs that have been logged in this session
-    last_seen_time = {}  # Student ID -> last seen timestamp
-    
+    logged_students = set()
+    last_seen_time = {}
+    face_positions = defaultdict(lambda: {'bbox': None, 'smoothed': None})
     prev_frame_time = 0
     frame_count = 0
-    last_processed_time = time.time()
-    
-    # Face position smoothing
-    face_positions = defaultdict(lambda: {'bbox': None, 'smoothed': None})
+
+    print("🎯 Starting face recognition loop...")
 
     while True:
         try:
@@ -495,7 +530,6 @@ def gen_frames(session_id):
             frame_count += 1
             current_time = time.time()
             
-            # Calculate FPS
             new_frame_time = current_time
             fps = 1 / (new_frame_time - prev_frame_time) if prev_frame_time > 0 else 0
             prev_frame_time = new_frame_time
@@ -511,134 +545,125 @@ def gen_frames(session_id):
                 if face_id in face_positions:
                     del face_positions[face_id]
 
-            # Process face recognition every frame for immediate response
-            should_process = True  # Process every frame for immediate recognition
-            
-            current_faces_in_frame = []
-            
-            if should_process:
-                last_processed_time = current_time
+            # ===== FACE DETECTION =====
+            small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+            rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+
+            face_locations = face_recognition.face_locations(rgb_small_frame)
+            face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
+            # ===== FACE MATCHING WITH 6-DECIMAL FORMATTING =====
+            for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+                orig_top, orig_right, orig_bottom, orig_left = top*4, right*4, bottom*4, left*4
                 
-                # Resize frame for faster processing
-                small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-                rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
-
-                # Face detection
-                face_locations = face_recognition.face_locations(rgb_small_frame)
-                face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
-
-                # Process each detected face
-                for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-                    # Scale coordinates back to original size
-                    orig_top, orig_right, orig_bottom, orig_left = top*4, right*4, bottom*4, left*4
+                name = "Unknown"
+                confidence = 0
+                student_id = None
+                
+                if len(known_encodings) > 0:
+                    # ===== FORMAT DETECTED ENCODING TO 6 DECIMAL PLACES =====
+                    formatted_detected_enc = np.array([
+                        float(f"{float(x):.6f}") for x in face_encoding
+                    ], dtype=np.float64)
                     
-                    name = "Unknown"
-                    confidence = 0
-                    student_id = None
+                    # Compare with known encodings (already formatted to 6 decimals)
+                    matches = face_recognition.compare_faces(
+                        known_encodings, 
+                        formatted_detected_enc, 
+                        tolerance=0.5
+                    )
                     
-                    if len(known_encodings) > 0:
-                        # Compare faces
-                        matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.5)
+                    if True in matches:
+                        match_indices = [i for i, match in enumerate(matches) if match]
                         
-                        if True in matches:
-                            # Get all matching indices
-                            match_indices = [i for i, match in enumerate(matches) if match]
+                        if match_indices:
+                            face_distances = face_recognition.face_distance(
+                                known_encodings, 
+                                formatted_detected_enc
+                            )
                             
-                            if match_indices:
-                                # Calculate distances for matches
-                                face_distances = face_recognition.face_distance(known_encodings, face_encoding)
+                            best_idx = match_indices[0]
+                            best_distance = face_distances[best_idx]
+                            
+                            for idx in match_indices[1:]:
+                                if face_distances[idx] < best_distance:
+                                    best_distance = face_distances[idx]
+                                    best_idx = idx
+                            
+                            name = student_names[best_idx]
+                            student_id = student_ids[best_idx]
+                            confidence = max(0, (1 - best_distance) * 100)
+                            
+                            # ===== UPDATE ATTENDANCE LOG =====
+                            try:
+                                should_update = False
                                 
-                                # Find best match with lowest distance
-                                best_idx = match_indices[0]
-                                best_distance = face_distances[best_idx]
-                                
-                                for idx in match_indices[1:]:
-                                    if face_distances[idx] < best_distance:
-                                        best_distance = face_distances[idx]
-                                        best_idx = idx
-                                
-                                name = student_names[best_idx]
-                                student_id = student_ids[best_idx]
-                                confidence = max(0, (1 - best_distance) * 100)
-                                
-                                # IMMEDIATE DATABASE UPDATE - REMOVED THE 5 SECOND DELAY
-                                try:
-                                    # Check if this student needs to be logged (first time seeing OR significant confidence increase)
-                                    should_update = False
-                                    
-                                    if student_id not in logged_students:
+                                if student_id not in logged_students:
+                                    should_update = True
+                                    logged_students.add(student_id)
+                                elif student_id in last_seen_time:
+                                    if current_time - last_seen_time[student_id] > 10:
                                         should_update = True
-                                        logged_students.add(student_id)
-                                    elif student_id in last_seen_time:
-                                        # Update if last seen was more than 10 seconds ago (refresh)
-                                        if current_time - last_seen_time[student_id] > 10:
-                                            should_update = True
-                                    
-                                    if should_update:
-                                        # Use transaction to ensure data integrity
-                                        with transaction.atomic():
-                                            student_obj = student_dict[student_id]
-                                            
-                                            # Update or create log
-                                            log, created = AttendanceLog.objects.get_or_create(
-                                                session=session,
-                                                student=student_obj,
-                                                defaults={
-                                                    'status': 'PRESENT',
-                                                    'confidence': confidence,
-                                                    'first_seen': timezone.now(),
-                                                    'last_seen': timezone.now()
-                                                }
-                                            )
-                                            
-                                            if not created:
-                                                # Update existing log
-                                                log.last_seen = timezone.now()
-                                                if confidence > (log.confidence or 0):
-                                                    log.confidence = confidence
-                                                log.save()
-                                            
-                                            last_seen_time[student_id] = current_time
-                                            print(f"✅ LOGGED: {name} ({confidence:.1f}%) - {timezone.now().strftime('%H:%M:%S')}")
-                                            
-                                except Exception as e:
-                                    print(f"⚠️ DB error: {e}")
+                                
+                                if should_update:
+                                    with transaction.atomic():
+                                        student_obj = student_dict[student_id]
+                                        
+                                        log, created = AttendanceLog.objects.get_or_create(
+                                            session=session,
+                                            student=student_obj,
+                                            defaults={
+                                                'status': 'PRESENT',
+                                                'confidence': confidence,
+                                                'first_seen': timezone.now(),
+                                                'last_seen': timezone.now()
+                                            }
+                                        )
+                                        
+                                        if not created:
+                                            log.last_seen = timezone.now()
+                                            if confidence > (log.confidence or 0):
+                                                log.confidence = confidence
+                                            log.save()
+                                        
+                                        last_seen_time[student_id] = current_time
+                                        print(f"✅ LOGGED: {name} ({confidence:.1f}%) - {timezone.now().strftime('%H:%M:%S')}")
+                                        
+                            except Exception as e:
+                                print(f"⚠️ DB error: {e}")
+                
+                # ===== FACE TRACKING =====
+                matched_face_id = None
+                for face_id, face_data in tracked_faces.items():
+                    old_bbox = face_data['bbox']
+                    old_center = ((old_bbox[1] + old_bbox[3])//2, (old_bbox[0] + old_bbox[2])//2)
+                    new_center = ((orig_left + orig_right)//2, (orig_top + orig_bottom)//2)
                     
-                    # Check if this face matches any existing tracked face
-                    matched_face_id = None
-                    for face_id, face_data in tracked_faces.items():
-                        old_bbox = face_data['bbox']
-                        old_center = ((old_bbox[1] + old_bbox[3])//2, (old_bbox[0] + old_bbox[2])//2)
-                        new_center = ((orig_left + orig_right)//2, (orig_top + orig_bottom)//2)
-                        
-                        distance = ((old_center[0] - new_center[0])**2 + (old_center[1] - new_center[1])**2)**0.5
-                        
-                        if distance < 100:
-                            matched_face_id = face_id
-                            break
+                    distance = ((old_center[0] - new_center[0])**2 + 
+                               (old_center[1] - new_center[1])**2)**0.5
                     
-                    if matched_face_id:
-                        # Update existing tracked face
-                        tracked_faces[matched_face_id]['bbox'] = (orig_top, orig_right, orig_bottom, orig_left)
-                        tracked_faces[matched_face_id]['name'] = name
-                        tracked_faces[matched_face_id]['confidence'] = confidence
-                        tracked_faces[matched_face_id]['student_id'] = student_id
-                        tracked_faces[matched_face_id]['last_seen'] = current_time
-                        current_faces_in_frame.append(matched_face_id)
-                    else:
-                        # New face - add to tracking
-                        new_face_id = next_face_id
-                        next_face_id += 1
-                        tracked_faces[new_face_id] = {
-                            'bbox': (orig_top, orig_right, orig_bottom, orig_left),
-                            'name': name,
-                            'confidence': confidence,
-                            'student_id': student_id,
-                            'last_seen': current_time
-                        }
-                        current_faces_in_frame.append(new_face_id)
+                    if distance < 100:
+                        matched_face_id = face_id
+                        break
+                
+                if matched_face_id:
+                    tracked_faces[matched_face_id]['bbox'] = (orig_top, orig_right, orig_bottom, orig_left)
+                    tracked_faces[matched_face_id]['name'] = name
+                    tracked_faces[matched_face_id]['confidence'] = confidence
+                    tracked_faces[matched_face_id]['student_id'] = student_id
+                    tracked_faces[matched_face_id]['last_seen'] = current_time
+                else:
+                    new_face_id = next_face_id
+                    next_face_id += 1
+                    tracked_faces[new_face_id] = {
+                        'bbox': (orig_top, orig_right, orig_bottom, orig_left),
+                        'name': name,
+                        'confidence': confidence,
+                        'student_id': student_id,
+                        'last_seen': current_time
+                    }
             
-            # DRAW ALL TRACKED FACES
+            # ===== DRAW TRACKED FACES =====
             for face_id, face_data in tracked_faces.items():
                 top, right, bottom, left = face_data['bbox']
                 name = face_data['name']

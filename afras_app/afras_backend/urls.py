@@ -12,6 +12,7 @@ def home(request):
 
 urlpatterns = [
     path('', home, name='home'),
+    path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('attendance/', include('attendance.urls')),

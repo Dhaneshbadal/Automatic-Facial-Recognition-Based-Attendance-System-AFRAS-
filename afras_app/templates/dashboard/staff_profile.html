@@ -1,0 +1,646 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{{ staff.full_name }} - Staff Profile{% endblock %}
+
+{% block extra_head %}
+<style>
+    .profile-container {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Header Styles */
+    .profile-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+        border-radius: 20px 20px 0 0;
+        padding: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 98, 255, 0.2);
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .profile-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 250px;
+        height: 250px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .profile-avatar {
+        width: 180px;
+        height: 180px;
+        border-radius: 20px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        object-fit: cover;
+        background: var(--surface-light);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        border-color: white;
+    }
+
+    .avatar-placeholder {
+        width: 180px;
+        height: 180px;
+        border-radius: 20px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .avatar-placeholder:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        border-color: white;
+    }
+
+    .avatar-placeholder i {
+        font-size: 4rem;
+        opacity: 0.5;
+        color: white;
+    }
+
+    .header-info {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .header-info h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 800;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .staff-id {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 8px 15px;
+        border-radius: 10px;
+        display: inline-block;
+        backdrop-filter: blur(10px);
+    }
+
+    .staff-badges {
+        display: flex;
+        gap: 10px;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge i {
+        font-size: 0.8rem;
+    }
+
+    /* Profile Sections */
+    .profile-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .profile-section:hover {
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px rgba(0, 98, 255, 0.05);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .section-header i {
+        font-size: 1.2rem;
+        color: var(--primary);
+        width: 35px;
+        height: 35px;
+        background: rgba(0, 98, 255, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .section-header h2 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-main);
+        flex: 1;
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1.2rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--surface-light);
+        transition: all 0.2s ease;
+    }
+
+    .info-item:hover {
+        background: rgba(0, 98, 255, 0.05);
+        transform: translateX(5px);
+    }
+
+    .info-item i {
+        color: var(--primary);
+        font-size: 1rem;
+        flex-shrink: 0;
+        width: 20px;
+        text-align: center;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-content label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+
+    .info-content .value {
+        font-size: 14px;
+        color: var(--text-main);
+        word-break: break-word;
+        line-height: 1.4;
+    }
+
+    .info-content .value a {
+        color: var(--primary);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .info-content .value a:hover {
+        text-decoration: underline;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .btn-action {
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        min-width: 150px;
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    .btn-back {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .btn-back:hover {
+        background: var(--surface-light);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-edit {
+        background: var(--primary);
+        color: white;
+        border: 1px solid var(--primary);
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 98, 255, 0.3);
+    }
+
+    .btn-delete {
+        background: transparent;
+        border: 1px solid var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .profile-header {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .header-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .profile-avatar,
+        .avatar-placeholder {
+            width: 150px;
+            height: 150px;
+        }
+
+        .avatar-placeholder i {
+            font-size: 3rem;
+        }
+
+        .header-info h1 {
+            font-size: 2rem;
+        }
+
+        .profile-sections {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-action {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-header {
+            padding: 1rem;
+        }
+
+        .header-info h1 {
+            font-size: 1.5rem;
+        }
+
+        .profile-avatar,
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-section {
+            padding: 1rem;
+        }
+
+        .info-item {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .staff-badges {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .badge {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Header Section -->
+    <div class="profile-header">
+        <div class="header-content">
+            {% if staff.photo %}
+            <img src="{{ staff.photo.url }}" class="profile-avatar" alt="{{ staff.full_name }}"
+                data-photo-src="{{ staff.photo.url }}" data-photo-title="{{ staff.full_name }}"
+                data-photo-subtitle="{{ staff.designation }} | {{ staff.department }}"
+                title="Click to view full size"
+                onclick="window.photoModal.open('{{ staff.photo.url }}', '{{ staff.full_name }}', '{{ staff.designation }} | {{ staff.department }}')">
+            {% else %}
+            <div class="avatar-placeholder"
+                onclick="window.photoModal.open('https://ui-avatars.com/api/?name={{ staff.full_name }}&background=0062ff&color=fff&size=400', '{{ staff.full_name }}', '{{ staff.designation }} | {{ staff.department }}')">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            {% endif %}
+
+            <div class="header-info">
+                <h1>{{ staff.full_name }}</h1>
+                <div class="staff-id">Staff ID: {{ staff.staff_id|default:staff.user.username }}</div>
+
+                <div class="staff-badges">
+                    <div class="badge">
+                        <i class="fas fa-building"></i>
+                        {{ staff.department|default:"No Department" }}
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-user-tag"></i>
+                        {{ staff.designation|default:"Staff Member" }}
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-graduation-cap"></i>
+                        {{ staff.degree|default:"N/A" }}
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-calendar-check"></i>
+                        Joined {{ staff.user.date_joined|date:"d M Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Sections -->
+    <div class="profile-sections">
+        <!-- Personal Information -->
+        <div class="profile-section">
+            <div class="section-header">
+                <i class="fas fa-user-circle"></i>
+                <h2>Personal Information</h2>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <i class="fas fa-id-card"></i>
+                    <div class="info-content">
+                        <label>Full Name</label>
+                        <div class="value">{{ staff.full_name }}</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-hashtag"></i>
+                    <div class="info-content">
+                        <label>Staff ID</label>
+                        <div class="value">{{ staff.staff_id|default:staff.user.username }}</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <div class="info-content">
+                        <label>Phone Number</label>
+                        <div class="value">{{ staff.phone_number|default:"Not provided" }}</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <div class="info-content">
+                        <label>Email Address</label>
+                        <div class="value">
+                            {% if staff.user.email %}
+                            <a href="mailto:{{ staff.user.email }}">{{ staff.user.email }}</a>
+                            {% else %}
+                            Not provided
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="info-content">
+                        <label>Address</label>
+                        <div class="value">{{ staff.address|default:"Not provided" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Information -->
+        <div class="profile-section">
+            <div class="section-header">
+                <i class="fas fa-briefcase"></i>
+                <h2>Professional Information</h2>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <i class="fas fa-building"></i>
+                    <div class="info-content">
+                        <label>Department</label>
+                        <div class="value">{{ staff.department|default:"Not specified" }}</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-user-tag"></i>
+                    <div class="info-content">
+                        <label>Designation</label>
+                        <div class="value">{{ staff.designation|default:"Staff Member" }}</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <div class="info-content">
+                        <label>Degree / Qualification</label>
+                        <div class="value">{{ staff.degree|default:"Not specified" }}</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="info-content">
+                        <label>Role</label>
+                        <div class="value">
+                            {% if staff.user.is_superuser %}
+                            <span style="color: var(--primary);">Administrator</span>
+                            {% else %}
+                            <span style="color: var(--success);">Staff Member</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div class="info-content">
+                        <label>Date Joined</label>
+                        <div class="value">{{ staff.user.date_joined|date:"d M Y, h:i A" }}</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <div class="info-content">
+                        <label>Last Login</label>
+                        <div class="value">{{ staff.user.last_login|date:"d M Y, h:i A"|default:"Never" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="javascript:history.back()" class="btn-action btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Directory
+        </a>
+
+        {% if request.user.is_superuser or request.user == staff.user %}
+        <a href="{% url 'edit-staff' staff.id %}" class="btn-action btn-edit">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+        {% endif %}
+
+        {% if request.user.is_superuser and request.user != staff.user %}
+        <a href="#" class="btn-action btn-delete" onclick="confirmDelete('{{ staff.id }}', '{{ staff.full_name }}')">
+            <i class="fas fa-trash-alt"></i> Delete Staff
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function showMessage(message, type) {
+        var notification = document.createElement('div');
+        notification.className = 'msg ' + type;
+        notification.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i><span>' + message + '</span>';
+        
+        var container = document.getElementById('django-messages');
+        if (!container) {
+            var newContainer = document.createElement('div');
+            newContainer.className = 'msg-container';
+            newContainer.id = 'django-messages';
+            newContainer.style.position = 'fixed';
+            newContainer.style.top = '20px';
+            newContainer.style.right = '20px';
+            newContainer.style.zIndex = '10001';
+            newContainer.style.width = '300px';
+            document.body.appendChild(newContainer);
+            newContainer.appendChild(notification);
+        } else {
+            container.appendChild(notification);
+        }
+
+        setTimeout(function() {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 3000);
+    }
+
+    function confirmDelete(staffId, staffName) {
+        if (confirm('Are you sure you want to delete ' + staffName + '? This action cannot be undone.')) {
+            fetch('/dashboard/staff/' + staffId + '/delete/', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(function(response) {
+                if (response.ok) {
+                    window.location.href = '/dashboard/staff-directory/';
+                } else {
+                    showMessage('Error deleting staff member', 'error');
+                }
+            }).catch(function() {
+                showMessage('Error deleting staff member', 'error');
+            });
+        }
+    }
+
+    // Close photo modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (window.photoModal && typeof window.photoModal.close === 'function') {
+                window.photoModal.close();
+            }
+        }
+    });
+</script>
+{% endblock %}

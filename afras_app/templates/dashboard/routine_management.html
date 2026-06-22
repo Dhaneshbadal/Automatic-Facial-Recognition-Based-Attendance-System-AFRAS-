@@ -54,6 +54,16 @@
         color: var(--primary);
     }
 
+    .btn-success {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+
     .input-group {
         display: flex;
         flex-direction: column;
@@ -122,7 +132,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 
     .stat-card {
@@ -160,18 +170,35 @@
         color: var(--warning);
     }
 
-    @media (max-width: 768px) {
-        div[style*="margin-left: 260px"] {
-            margin-left: 0 !important;
-        }
+    /* Extracted Routines Table */
+    .extracted-table-wrapper {
+        overflow-x: auto;
+        margin-top: 0.5rem;
+    }
 
-        .stats-cards {
-            grid-template-columns: 1fr;
-        }
+    .extracted-table-wrapper table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        div[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-        }
+    .extracted-table-wrapper th {
+        text-align: left;
+        padding: 12px;
+        color: var(--text-dim);
+        border-bottom: 1px solid var(--border);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .extracted-table-wrapper td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+    }
+
+    .extracted-table-wrapper tr:hover {
+        background: rgba(0, 0, 0, 0.02);
     }
 
     /* File upload zone styles */
@@ -231,6 +258,42 @@
     .notification.info {
         background: var(--primary);
     }
+
+    @media (max-width: 768px) {
+        .stats-cards {
+            grid-template-columns: 1fr;
+        }
+
+        div[style*="grid-template-columns: 1fr 1fr"] {
+            grid-template-columns: 1fr !important;
+        }
+
+        .extracted-table-wrapper table {
+            font-size: 0.8rem;
+        }
+
+        .extracted-table-wrapper th,
+        .extracted-table-wrapper td {
+            padding: 8px 6px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .extracted-table-wrapper table {
+            font-size: 0.7rem;
+            min-width: 500px;
+        }
+
+        .extracted-table-wrapper th,
+        .extracted-table-wrapper td {
+            padding: 6px 4px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -280,6 +343,10 @@
                 <div class="input-group">
                     <label>Subject / Module</label>
                     <input type="text" name="subject" id="manual-name" placeholder="e.g., Computer Graphics" required>
+                </div>
+                <div class="input-group">
+                    <label>Start Time</label>
+                    <input type="time" name="start_time" id="manual-start-time" value="09:00" required>
                 </div>
                 <div class="input-group">
                     <label>Duration (minutes)</label>
@@ -332,7 +399,7 @@
 
                 <div id="extraction-actions" style="display: none; margin-top: 20px;">
                     <button type="button" onclick="handleExtractionSubmit()" class="btn btn-primary"
-                        style="width: 100%; justify-content: center; background: var(--gradient);">
+                        style="width: 100%; justify-content: center;">
                         <i class="fas fa-brain"></i> Extract & Automate
                     </button>
                 </div>
@@ -343,8 +410,8 @@
 
     <!-- Recent Sessions Section -->
     <div
-        style="margin-top: 40px; background: var(--surface); border-radius: 24px; border: 1px solid var(--border); padding: 1.5rem;">
-        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+        style="margin-top: 0.5rem; background: var(--surface); border-radius: 24px; border: 1px solid var(--border); padding: 1.5rem;">
+        <h3 style="display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-history" style="color: var(--primary);"></i>
             Recent Sessions
         </h3>
@@ -381,6 +448,65 @@
             </table>
         </div>
     </div>
+
+    <!-- ===== EXTRACTED ROUTINES SECTION ===== -->
+    {% if extracted_routines %}
+    <div id="extracted-routines-section"
+        style="margin-top: 40px; background: var(--surface); border-radius: 24px; border: 1px solid var(--border); padding: 1.5rem;">
+        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-robot" style="color: var(--primary);"></i>
+            AI Extracted Routines
+            <span
+                style="font-size: 0.7rem; background: var(--success); color: white; padding: 2px 12px; border-radius: 20px; margin-left: 10px;">
+                {{ extracted_routines|length }} sessions
+            </span>
+        </h3>
+        <div class="extracted-table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for routine in extracted_routines %}
+                    <tr>
+                        <td style="font-weight: 500;">{{ routine.subject }}</td>
+                        <td>{{ routine.date }}</td>
+                        <td style="font-family: 'JetBrains Mono';">{{ routine.time }}</td>
+                        <td>{{ routine.duration }} mins</td>
+                        <td>
+                            <span
+                                class="{% if routine.status == 'created' %}session-active{% else %}session-inactive{% endif %}">
+                                {% if routine.status == 'created' %}
+                                <i class="fas fa-check-circle"></i> Created
+                                {% else %}
+                                <i class="fas fa-clock"></i> Already Exists
+                                {% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 1.5rem; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+            <button onclick="clearExtractedRoutines()" class="btn btn-outline"
+                style="padding: 8px 20px; font-size: 0.8rem;">
+                <i class="fas fa-times"></i> Clear All
+            </button>
+            <button onclick="applyExtractedRoutines()" class="btn btn-success"
+                style="padding: 8px 20px; font-size: 0.8rem;">
+                <i class="fas fa-play"></i> Apply All Sessions
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 
 <!-- Notification container -->
@@ -402,7 +528,7 @@
     });
 
     // ============================================
-    // ACTIVE SESSION CHECK (Auto-start feature)
+    // ACTIVE SESSION CHECK
     // ============================================
     async function checkActiveSession() {
         try {
@@ -451,9 +577,9 @@
         });
     }
 
-    window.updateFileLabel = function(input) {
+    window.updateFileLabel = function (input) {
         if (input.files && input.files[0]) {
-            document.getElementById('file-name').innerText = `ATTACHED: ${input.files[0].name}`;
+            document.getElementById('file-name').innerText = `📎 ${input.files[0].name}`;
             document.getElementById('extraction-actions').style.display = 'block';
             document.getElementById('file-label-container').style.opacity = '0.3';
         }
@@ -497,7 +623,7 @@
                     <tr>
                         <td style="padding: 12px; border-bottom: 1px solid var(--border); font-weight: 500;">${session.subject || 'N/A'}</td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--border);">${session.date || 'N/A'}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono';">${session.time_range || 'N/A'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono';">${session.time || 'N/A'}</td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--border);">
                             <span class="${session.is_active ? 'session-active' : 'session-inactive'}">
                                 ${session.is_active ? 'ACTIVE' : 'INACTIVE'}
@@ -536,7 +662,7 @@
     // ============================================
     // MANUAL SESSION SUBMISSION
     // ============================================
-    window.handleManualSubmit = function() {
+    window.handleManualSubmit = function () {
         const statusBadge = document.getElementById('system-status');
         const form = document.getElementById('manual-routine-form');
         const submitBtn = document.querySelector('button[onclick="handleManualSubmit()"]');
@@ -562,101 +688,88 @@
         statusBadge.innerText = 'INITIALIZING_SESSION...';
         statusBadge.style.color = 'var(--warning)';
 
-        fetch('/attendance/start/', {
+        fetch('/dashboard/routine-start-manual/', {
             method: 'POST',
             body: formData,
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             }
         })
-        .then(response => {
-            // Check if the response is a redirect (session started successfully)
-            if (response.redirected) {
-                // Session was created and server redirected to live monitoring
-                statusBadge.innerText = 'SESSION_ACTIVE';
-                statusBadge.style.color = 'var(--success)';
-                
-                showNotification('Session started successfully!', 'success');
-                
-                // Reload the sessions table and stats
-                return Promise.all([
-                    loadRecentSessions(),
-                    loadSessionStats()
-                ]).then(() => {
-                    // After reloading data, redirect to the live monitoring page
-                    setTimeout(() => {
-                        window.location.href = response.url;
-                    }, 1500);
-                });
-            }
-            
-            // If not a redirect, try to parse as JSON
-            return response.json().then(data => {
-                if (data.success) {
+            .then(response => {
+                if (response.redirected) {
                     statusBadge.innerText = 'SESSION_ACTIVE';
                     statusBadge.style.color = 'var(--success)';
 
                     showNotification('Session started successfully!', 'success');
 
-                    // Reload data
-                    loadRecentSessions();
-                    loadSessionStats();
-
-                    // Redirect to live monitoring
-                    if (data.redirect_url) {
+                    return Promise.all([
+                        loadRecentSessions(),
+                        loadSessionStats()
+                    ]).then(() => {
                         setTimeout(() => {
-                            window.location.href = data.redirect_url;
+                            window.location.href = response.url;
                         }, 1500);
+                    });
+                }
+
+                return response.json().then(data => {
+                    if (data.success) {
+                        statusBadge.innerText = 'SESSION_ACTIVE';
+                        statusBadge.style.color = 'var(--success)';
+
+                        showNotification('Session started successfully!', 'success');
+
+                        loadRecentSessions();
+                        loadSessionStats();
+
+                        if (data.redirect_url) {
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url;
+                            }, 1500);
+                        }
+                    } else {
+                        statusBadge.innerText = 'ERROR';
+                        statusBadge.style.color = 'var(--danger)';
+                        showNotification('Error: ' + (data.message || 'Unknown error'), 'error');
                     }
-                } else {
-                    statusBadge.innerText = 'ERROR';
-                    statusBadge.style.color = 'var(--danger)';
-                    showNotification('Error: ' + (data.message || 'Unknown error'), 'error');
+                });
+            })
+            .catch(err => {
+                console.error('Submission error:', err);
+                loadRecentSessions();
+                loadSessionStats();
+
+                statusBadge.innerText = 'CHECKING_STATUS...';
+                statusBadge.style.color = 'var(--warning)';
+
+                setTimeout(() => {
+                    checkActiveSession();
+                    const activeElement = document.getElementById('active-sessions');
+                    if (activeElement && parseInt(activeElement.textContent) > 0) {
+                        showNotification('Session started! Refreshing data...', 'success');
+                    } else {
+                        showNotification('Session may not have started. Please check the table.', 'warning');
+                    }
+                }, 2000);
+            })
+            .finally(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
                 }
             });
-        })
-        .catch(err => {
-            console.error('Submission error:', err);
-            
-            // Even if there's an error, the session might have been created
-            // Try to reload the sessions to see if it worked
-            loadRecentSessions();
-            loadSessionStats();
-            
-            statusBadge.innerText = 'CHECKING_STATUS...';
-            statusBadge.style.color = 'var(--warning)';
-            
-            // Check if session was actually created by looking at the stats after a short delay
-            setTimeout(() => {
-                checkActiveSession();
-                // If we see an active session now, consider it a success
-                const activeElement = document.getElementById('active-sessions');
-                if (activeElement && parseInt(activeElement.textContent) > 0) {
-                    showNotification('Session started! Refreshing data...', 'success');
-                } else {
-                    showNotification('Session may not have started. Please check the table.', 'warning');
-                }
-            }, 2000);
-        })
-        .finally(() => {
-            // Re-enable button
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        });
     };
 
     // ============================================
     // AI EXTRACTION SUBMISSION
     // ============================================
-    window.handleExtractionSubmit = function() {
+    window.handleExtractionSubmit = function () {
         const statusBadge = document.getElementById('system-status');
         const form = document.getElementById('extraction-form');
         const submitBtn = document.querySelector('button[onclick="handleExtractionSubmit()"]');
         const formData = new FormData(form);
 
-        // Check if file is selected
+        // Validate file
         const fileInput = document.getElementById('routine-file');
         if (!fileInput.files || !fileInput.files[0]) {
             showNotification('Please select a file first', 'error');
@@ -681,62 +794,150 @@
         statusBadge.innerText = 'AI_EXTRACTING_DATA...';
         statusBadge.style.color = 'var(--warning)';
 
-        fetch('/attendance/api/extract-routine/', {
+        // Log for debugging
+        console.log('📤 Sending file:', fileInput.files[0].name);
+        console.log('📦 File size:', fileInput.files[0].size, 'bytes');
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+            document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+
+        fetch('/dashboard/routine-extract-ai/', {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => {
-            // Check if response is JSON
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return response.json();
-            }
-            // If not JSON but successful, assume it worked
-            if (response.ok || response.redirected) {
-                return { success: true, message: 'Extraction completed' };
-            }
-            throw new Error('Unexpected response format');
-        })
-        .then(data => {
-            if (data.success) {
-                statusBadge.innerText = 'AUTOMATION_SYNCED';
-                statusBadge.style.color = 'var(--success)';
+            .then(async response => {
+                console.log('📥 Response status:', response.status);
+                const text = await response.text();
+                console.log('📄 Response text:', text);
 
-                let message = `✅ Extraction Complete! Found ${data.classes_count || 0} scheduled sessions.`;
-                showNotification(message, 'success');
+                try {
+                    const data = JSON.parse(text);
+                    return { response, data };
+                } catch (e) {
+                    console.error('❌ Failed to parse JSON:', e);
+                    throw new Error(`Invalid response from server (Status: ${response.status})`);
+                }
+            })
+            .then(({ response, data }) => {
+                if (response.ok && data.success) {
+                    statusBadge.innerText = 'AUTOMATION_SYNCED';
+                    statusBadge.style.color = 'var(--success)';
 
-                // Reload recent sessions and stats
-                loadRecentSessions();
-                loadSessionStats();
+                    let message = `✅ Extraction Complete! Found ${data.classes_count || 0} scheduled sessions.`;
+                    if (data.created_count) {
+                        message += ` Created ${data.created_count} new sessions.`;
+                    }
+                    if (data.existing_count) {
+                        message += ` Found ${data.existing_count} existing sessions.`;
+                    }
+                    showNotification(message, 'success');
 
-                // Reset file input
-                fileInput.value = '';
-                document.getElementById('file-name').innerText = '';
-                document.getElementById('extraction-actions').style.display = 'none';
-                document.getElementById('file-label-container').style.opacity = '1';
-            } else {
+                    loadRecentSessions();
+                    loadSessionStats();
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    const errorMsg = data?.message || 'Extraction failed';
+                    statusBadge.innerText = 'ERROR';
+                    statusBadge.style.color = 'var(--danger)';
+                    showNotification('❌ Extraction Failed: ' + errorMsg, 'error');
+                    console.error('❌ Server error:', data);
+                }
+            })
+            .catch(err => {
+                console.error('❌ Error:', err);
                 statusBadge.innerText = 'ERROR';
                 statusBadge.style.color = 'var(--danger)';
-                showNotification('Extraction Failed: ' + (data.message || 'Unknown error'), 'error');
-            }
-        })
-        .catch(err => {
-            console.error('Extraction error:', err);
-            statusBadge.innerText = 'ERROR';
-            statusBadge.style.color = 'var(--danger)';
-            showNotification('AI Processing Error', 'error');
-        })
-        .finally(() => {
-            // Re-enable button
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        });
+                showNotification('❌ Error: ' + err.message, 'error');
+            })
+            .finally(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
     };
+
+    // ============================================
+    // EXTRACTED ROUTINES FUNCTIONS
+    // ============================================
+    function clearExtractedRoutines() {
+        if (!confirm('Clear all extracted routines from this session?')) return;
+
+        fetch('/dashboard/api/clear-extracted-routines/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Extracted routines cleared', 'success');
+                    document.getElementById('extracted-routines-section').remove();
+                } else {
+                    showNotification('Error clearing routines', 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showNotification('Error clearing routines', 'error');
+            });
+    }
+
+    function applyExtractedRoutines() {
+        if (!confirm('Apply all extracted routines to create attendance sessions?')) return;
+
+        const btn = document.querySelector('button[onclick="applyExtractedRoutines()"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
+        }
+
+        showNotification('Applying routines...', 'info');
+
+        fetch('/dashboard/api/apply-extracted-routines/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`${data.created} sessions created successfully!`, 'success');
+                    loadRecentSessions();
+                    loadSessionStats();
+                    // Remove the extracted routines section
+                    const section = document.getElementById('extracted-routines-section');
+                    if (section) section.remove();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showNotification(data.message || 'Error applying routines', 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showNotification('Error applying routines', 'error');
+            })
+            .finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-play"></i> Apply All Sessions';
+                }
+            });
+    }
 
     // ============================================
     // NOTIFICATION SYSTEM
@@ -744,18 +945,15 @@
     function showNotification(message, type = 'info') {
         const container = document.getElementById('notification-container');
 
-        // Remove existing notifications
         const existingNotifications = container.querySelectorAll('.notification');
         existingNotifications.forEach(n => n.remove());
 
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.innerHTML = message;
-        
-        // Set background color based on type
+
         let bgColor;
-        switch(type) {
+        switch (type) {
             case 'success':
                 bgColor = 'var(--success)';
                 break;
@@ -768,7 +966,7 @@
             default:
                 bgColor = 'var(--primary)';
         }
-        
+
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -785,7 +983,6 @@
 
         container.appendChild(notification);
 
-        // Auto remove after 5 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease forwards';
             setTimeout(() => {
