@@ -1,21 +1,23 @@
 import os
 from pathlib import Path
+import pytz
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kathmandu'  
+USE_TZ = True 
 USE_I18N = True
 USE_L10N = True
-USE_TZ = True 
 SECRET_KEY = 'your-secret-key'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.100.18', '127.0.0.1', 'localhost']
 
 # Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    "django_browser_reload",
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -27,6 +29,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

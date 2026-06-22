@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+
+# Database
+db.sqlite3
+*.sqlite3
+
+# Media & user uploads
+media/
+student_images/
+
+# Debug / generated files
+debug_*
+*.png
+*.jpg
+*.jpeg
+
+# OS
+.DS_Store
+
+# Django stuff (optional but recommended)
+*.log

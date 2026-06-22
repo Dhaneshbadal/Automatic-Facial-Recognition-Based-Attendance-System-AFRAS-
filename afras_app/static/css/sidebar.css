@@ -1,5 +1,6 @@
-/* Sidebar Styles */
-aside {
+/* Sidebar Styles - Target only the main sidebar */
+
+#sidebar {
     width: var(--sidebar-width);
     background: var(--bg);
     border-right: 1px solid var(--border);
@@ -15,37 +16,40 @@ aside {
     left: 0;
     top: 0;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-aside.collapsed {
+#sidebar.collapsed {
     width: var(--sidebar-collapsed);
 }
 
+
 /* Desktop Styles - Sidebar pushes content */
+
 @media (min-width: 769px) {
-    aside {
+    #sidebar {
         transform: translateX(0) !important;
         transition: width var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     main {
         margin-left: var(--sidebar-width);
         transition: margin-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
         width: calc(100% - var(--sidebar-width));
     }
-
     main.expanded {
         margin-left: var(--sidebar-collapsed);
         width: calc(100% - var(--sidebar-collapsed));
     }
 }
 
+
 /* Toggle Button - Desktop only */
+
 @media (min-width: 769px) {
     .sidebar-toggle {
         position: absolute;
-        top: 24px;
-        right: -12px;
+        top: 5px;
+        right: 0;
         background: var(--primary);
         color: white;
         width: 24px;
@@ -61,27 +65,25 @@ aside.collapsed {
         z-index: 1001;
         box-shadow: var(--shadow-md);
     }
-
     .sidebar-toggle:hover {
         background: var(--primary);
         transform: translateX(2px);
         box-shadow: 0 0 15px rgba(26, 86, 148, 0.4);
     }
-
-    aside.collapsed .sidebar-toggle {
-        right: -12px;
+    #sidebar.collapsed .sidebar-toggle {
+        right: 0;
     }
-
-    aside.collapsed .sidebar-toggle:hover {
+    #sidebar.collapsed .sidebar-toggle:hover {
         transform: translateX(-2px);
     }
-
     .sidebar-toggle i {
         transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
+
 /* Mobile Menu Button */
+
 .mobile-menu-btn {
     display: none;
     position: fixed;
@@ -107,6 +109,7 @@ aside.collapsed {
     transform: scale(1.05);
 }
 
+
 /* Overlay for mobile - covers content when drawer is open */
 .sidebar-overlay {
     display: none;
@@ -129,18 +132,19 @@ aside.collapsed {
     visibility: visible;
 }
 
+
 /* Mobile Styles - Drawer Behavior (sidebar slides OVER content) */
 @media (max-width: 768px) {
-    :root {
+     :root {
         --sidebar-width: 280px;
     }
-
     .mobile-menu-btn {
         display: flex;
     }
 
     /* Sidebar starts hidden off-screen */
-    aside {
+    #sidebar {
+        width: var(--sidebar-width);
         transform: translateX(-100%);
         width: var(--sidebar-width) !important;
         box-shadow: 2px 0 30px rgba(0, 0, 0, 0.3);
@@ -149,17 +153,17 @@ aside.collapsed {
     }
 
     /* When active, slide in OVER the content */
-    aside.active {
+    #sidebar.active {
         transform: translateX(0);
     }
 
     /* Ignore collapsed state on mobile - always show full content */
-    aside.collapsed {
+    #sidebar.collapsed {
         width: var(--sidebar-width) !important;
         transform: translateX(-100%);
     }
 
-    aside.collapsed.active {
+    #sidebar.collapsed.active {
         transform: translateX(0);
     }
 
@@ -167,45 +171,39 @@ aside.collapsed {
     .sidebar-toggle {
         display: none !important;
     }
-
+    
     /* Main content is FULL WIDTH - no margin shift */
     main {
         margin-left: 0 !important;
         width: 100% !important;
-        padding: 70px 1rem 1rem !important;
-        /* Space for mobile menu button */
+        padding: 50px 1rem 1rem !important;
         transition: none !important;
-        /* No margin transition on mobile */
     }
 
     /* Ensure full content shows when sidebar is active */
-    aside.active .nav-text,
-    aside.active .profile-info,
-    aside.active .nav-brand span,
-    aside.active .logout-btn span {
+    #sidebar.active .nav-text,
+    #sidebar.active .profile-info,
+    #sidebar.active .nav-brand span,
+    #sidebar.active .logout-btn span {
         opacity: 1 !important;
         width: auto !important;
         display: inline-block !important;
         visibility: visible !important;
     }
-
-    aside.active .nav-link {
+    #sidebar.active .nav-link {
         justify-content: flex-start !important;
         padding: 12px 16px !important;
     }
-
-    aside.active .nav-link .nav-icon {
+    #sidebar.active .nav-link .nav-icon {
         margin-right: 12px !important;
     }
-
-    aside.active .profile-photo {
+    #sidebar.active .profile-photo {
         width: 80px !important;
         height: 80px !important;
     }
-
-    aside.active .nav-brand {
+    #sidebar.active .nav-brand {
         justify-content: flex-start !important;
-        padding: 0 1.5rem !important;
+        padding: 0 3.5rem !important;
     }
 
     /* Hide tooltips on mobile */
@@ -223,7 +221,6 @@ aside.collapsed {
         top: 70px !important;
         width: auto !important;
     }
-
     .msg {
         min-width: 280px !important;
         width: auto !important;
@@ -235,12 +232,13 @@ aside.collapsed {
     }
 }
 
-/* Rest of your existing styles remain the same */
+
+
 /* Brand Logo */
 .nav-brand {
     font-weight: 800;
     font-size: 1.25rem;
-    margin: 1rem 0 1rem;
+    margin: 1rem 1rem 1rem;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -250,10 +248,10 @@ aside.collapsed {
     transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-aside.collapsed .nav-brand {
+#sidebar.collapsed .nav-brand {
     padding: 0;
     justify-content: center;
-    margin: 1.5rem 0 2rem;
+    margin: 1.5rem 0 1rem;
 }
 
 .nav-brand i {
@@ -267,14 +265,17 @@ aside.collapsed .nav-brand {
     letter-spacing: 1px;
 }
 
-aside.collapsed .nav-brand span {
+#sidebar.collapsed .nav-brand span {
     opacity: 0;
     width: 0;
     display: none;
 }
 
+
+
 /* Profile Section */
 .user-profile {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -285,7 +286,7 @@ aside.collapsed .nav-brand span {
     transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-aside.collapsed .user-profile {
+#sidebar.collapsed .user-profile {
     padding: 0 0.5rem 1.5rem;
 }
 
@@ -304,7 +305,7 @@ aside.collapsed .user-profile {
     box-shadow: 0 4px 12px rgba(26, 86, 148, 0.2);
 }
 
-aside.collapsed .profile-photo {
+#sidebar.collapsed .profile-photo {
     width: 45px;
     height: 45px;
     border-radius: 12px;
@@ -315,7 +316,7 @@ aside.collapsed .profile-photo {
     border-color: #0e3d6b;
 }
 
-aside.collapsed .profile-photo:hover {
+#sidebar.collapsed .profile-photo:hover {
     transform: none;
 }
 
@@ -331,6 +332,7 @@ aside.collapsed .profile-photo:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+
 /* Profile info */
 .profile-info {
     text-align: center;
@@ -338,7 +340,7 @@ aside.collapsed .profile-photo:hover {
     transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-aside.collapsed .profile-info {
+#sidebar.collapsed .profile-info {
     display: none;
 }
 
@@ -361,16 +363,58 @@ aside.collapsed .profile-info {
     gap: 4px;
 }
 
-/* Navigation Menu */
+
+/* Navigation Menu - Scrollable section */
 .nav-menu {
     list-style: none;
-    flex-grow: 1;
+    flex: 1;
+    /* Takes remaining space */
     padding: 0 1rem;
+    margin: 0;
+    overflow-y: auto;
+    /* THIS IS CRITICAL - enables scrolling */
+    min-height: 0;
+    /* Important for flex children */
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
 }
 
-.nav-item {
-    position: relative;
-    margin-bottom: 6px;
+
+/* Hide scrollbar by default */
+.nav-menu::-webkit-scrollbar {
+    width: 3px;
+    background: transparent;
+}
+
+.nav-menu::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 5px 0;
+}
+
+.nav-menu::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+
+/* Show scrollbar ONLY on hover */
+.nav-menu:hover::-webkit-scrollbar-thumb {
+    background: var(--border);
+}
+
+.nav-menu:hover::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+
+/* Firefox support */
+.nav-menu {
+    scrollbar-color: transparent transparent;
+}
+
+.nav-menu:hover {
+    scrollbar-color: var(--border) transparent;
 }
 
 .nav-link {
@@ -387,7 +431,7 @@ aside.collapsed .profile-info {
     white-space: nowrap;
 }
 
-aside.collapsed .nav-link {
+#sidebar.collapsed .nav-link {
     padding: 14px;
     justify-content: center;
 }
@@ -398,10 +442,10 @@ aside.collapsed .nav-link {
 }
 
 .nav-link.active {
-    background: var(--primary);
-    color: white;
-    box-shadow: 0 4px 12px rgba(26, 86, 148, 0.3);
+    background: transparent;
+    color: var(--primary);
 }
+
 
 /* Icon styling */
 .nav-icon {
@@ -413,7 +457,7 @@ aside.collapsed .nav-link {
     display: inline-block !important;
 }
 
-aside.collapsed .nav-icon {
+#sidebar.collapsed .nav-icon {
     font-size: 1.3rem;
     margin: 0;
 }
@@ -422,9 +466,10 @@ aside.collapsed .nav-icon {
     transform: scale(1.1);
 }
 
-aside.collapsed .nav-link:hover .nav-icon {
+#sidebar.collapsed .nav-link:hover .nav-icon {
     transform: none;
 }
+
 
 /* Text styling */
 .nav-text {
@@ -432,11 +477,12 @@ aside.collapsed .nav-link:hover .nav-icon {
     font-weight: 500;
 }
 
-aside.collapsed .nav-text {
+#sidebar.collapsed .nav-text {
     opacity: 0;
     width: 0;
     display: none;
 }
+
 
 /* Tooltips */
 .nav-tooltip,
@@ -477,25 +523,28 @@ aside.collapsed .nav-text {
     border-color: transparent var(--surface) transparent transparent;
 }
 
-aside.collapsed .nav-link:hover .nav-tooltip,
-aside.collapsed .user-profile:hover .profile-tooltip,
-aside.collapsed .logout-btn:hover .logout-tooltip {
+#sidebar.collapsed .nav-link:hover .nav-tooltip,
+#sidebar.collapsed .user-profile:hover .profile-tooltip,
+#sidebar.collapsed .logout-btn:hover .logout-tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateY(-50%) scale(1);
     left: calc(100% + 10px);
 }
 
+
 /* Logout Section */
 .logout-section {
     margin-top: auto;
-    padding: 0.5rem 1rem 0.5rem;
+    padding: 0 1rem 0;
     border-top: 1px solid var(--border);
     position: relative;
+    background: var(--bg);
+    flex-shrink: 0;
 }
 
-aside.collapsed .logout-section {
-    padding: 1rem 0.5rem 1.5rem;
+#sidebar.collapsed .logout-section {
+    padding: 0rem 0.5rem 0;
 }
 
 .logout-btn {
@@ -515,13 +564,13 @@ aside.collapsed .logout-section {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-aside.collapsed .logout-btn {
+#sidebar.collapsed .logout-btn {
     justify-content: center;
     padding: 12px;
 }
 
 .logout-btn:hover {
-    background: rgba(231, 76, 60, 0.1);
+    background: transparent;
     color: var(--danger);
 }
 
@@ -534,158 +583,44 @@ aside.collapsed .logout-btn {
     transform: translateX(2px);
 }
 
-aside.collapsed .logout-btn span {
+#sidebar.collapsed .logout-btn span {
     display: none;
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
+
+/* Responsive Design */
+
 @media (max-width: 1024px) {
-    :root {
+     :root {
         --sidebar-width: 220px;
         --sidebar-collapsed: 70px;
     }
-
-    .nav-brand {
-        font-size: 1.1rem;
-    }
-
-    .nav-brand i {
-        font-size: 1.5rem;
-    }
-
-    .nav-brand span {
-        font-size: 1.2rem;
-    }
 }
 
-
 @media (max-width: 768px) {
-
-
-    aside {
+    #sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         width: 280px !important;
-        /* Fixed width */
     }
-
-    aside.active {
+    #sidebar.active {
         transform: translateX(0);
     }
-
-    /* Main content stays full width */
-    main {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
-
-    /* Hide desktop toggle, show mobile menu button */
-    .sidebar-toggle {
-        display: none !important;
-    }
-
-    .mobile-menu-btn {
-        display: flex !important;
-    }
-
-    /* Overlay */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-    }
-
-    .sidebar-overlay.active {
-        display: block;
-    }
-
-    /* Ignore collapsed state on mobile */
-    aside.collapsed {
+    #sidebar.collapsed {
         transform: translateX(-100%);
         width: 280px !important;
-    }
-
-    aside.collapsed.active {
-        transform: translateX(0);
     }
 }
 
 @media (max-width: 480px) {
-    :root {
+     :root {
         --sidebar-width: 260px;
     }
-
-    .nav-brand {
-        margin: 1rem 0 1.5rem;
-    }
-
-    .nav-brand i {
-        font-size: 1.3rem;
-    }
-
-    .nav-brand span {
-        font-size: 1rem;
-    }
-
-    .profile-photo {
-        width: 70px;
-        height: 70px;
-    }
-
-    .profile-name {
-        font-size: 0.85rem;
-    }
-
-    .profile-role-badge {
-        font-size: 0.65rem;
-        padding: 3px 10px;
-    }
-
-    .nav-link {
-        padding: 10px 14px;
-        font-size: 0.85rem;
-    }
-
-    .nav-icon {
-        font-size: 1.1rem;
-        min-width: 22px;
-    }
-
-    .logout-btn {
-        padding: 10px 14px;
-    }
 }
 
-/* Landscape mode on mobile */
-@media (max-width: 896px) and (orientation: landscape) {
-    aside.active {
-        overflow-y: auto;
-    }
-
-    .user-profile {
-        padding: 0 1rem 1rem;
-    }
-
-    .profile-photo {
-        width: 60px;
-        height: 60px;
-    }
-
-    .nav-menu {
-        padding: 0 0.8rem;
-    }
-
-    .nav-link {
-        padding: 8px 12px;
-    }
-}
 
 /* Smooth transitions for all interactive elements */
+
 .nav-link,
 .logout-btn,
 .sidebar-toggle,
@@ -695,34 +630,8 @@ aside.collapsed .logout-btn span {
 .nav-icon,
 .nav-text,
 .sidebar-overlay,
-aside,
+#sidebar,
 main,
 .sidebar-toggle i {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Fix for very small devices */
-@media (max-width: 320px) {
-    :root {
-        --sidebar-width: 240px;
-    }
-
-    .nav-brand i {
-        font-size: 1.2rem;
-    }
-
-    .profile-photo {
-        width: 60px;
-        height: 60px;
-    }
-
-    .nav-link {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-    }
-
-    .nav-icon {
-        font-size: 1rem;
-        min-width: 20px;
-    }
 }

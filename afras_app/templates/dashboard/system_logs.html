@@ -9,7 +9,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 2rem;
+        margin-bottom: 0.5rem;
         gap: 20px;
         flex-wrap: wrap;
     }
@@ -26,12 +26,14 @@
         align-items: center;
         flex-wrap: wrap;
         border-radius: 16px;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .search-box {
         position: relative;
         width: 300px;
+        flex: 0;
+        min-width: 300px;
     }
 
     .search-box input {
@@ -63,6 +65,8 @@
     .filter-dropdown {
         position: relative;
         min-width: 180px;
+        flex: 0;
+        min-width: 150px;
     }
 
     .filter-select {
@@ -147,34 +151,30 @@
         background: rgba(245, 158, 11, 0.1);
     }
 
-    .results-count {
-        color: var(--text-dim);
-        font-size: 0.9rem;
-        margin-left: auto;
-        white-space: nowrap;
-    }
-
-    .results-count strong {
-        color: var(--primary);
-        font-weight: 800;
-    }
-
     .logs-panel {
         background: var(--surface);
         border-radius: 24px;
         border: 1px solid var(--border);
         overflow: hidden;
-        margin-top: 1rem;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
         text-align: left;
+        min-width: 800px;
     }
 
     thead {
         background: rgba(255, 255, 255, 0.02);
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     th {
@@ -184,10 +184,11 @@
         letter-spacing: 1px;
         color: var(--text-dim);
         border-bottom: 1px solid var(--border);
+        white-space: nowrap;
     }
 
     td {
-        padding: 16px 20px;
+        padding: 7px 14px;
         border-bottom: 1px solid var(--border);
         font-size: 0.9rem;
         vertical-align: middle;
@@ -204,6 +205,7 @@
     .timestamp-col {
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.8rem;
+        white-space: nowrap;
     }
 
     .timestamp-date {
@@ -221,6 +223,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        min-width: 120px;
     }
 
     .user-avatar {
@@ -238,6 +241,7 @@
         font-size: 0.9rem;
         cursor: pointer;
         transition: all 0.3s ease;
+        flex-shrink: 0;
     }
 
     .user-avatar:hover {
@@ -257,6 +261,7 @@
         border-radius: 20px;
         font-size: 0.75rem;
         font-weight: 700;
+        white-space: nowrap;
     }
 
     .action-badge.delete {
@@ -286,6 +291,7 @@
         font-size: 0.8rem;
         line-height: 1.4;
         color: var(--text-main);
+        word-wrap: break-word;
     }
 
     .ip-badge {
@@ -293,6 +299,7 @@
         font-size: 0.75rem;
         color: var(--text-dim);
         display: inline-block;
+        white-space: nowrap;
     }
 
     .ip-badge i {
@@ -308,6 +315,222 @@
         color: var(--success);
     }
 
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .status-badge.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .status-badge.archived {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .tr-archived {
+        opacity: 0.6;
+        background: rgba(239, 68, 68, 0.03);
+    }
+
+    .tr-archived:hover {
+        background: rgba(239, 68, 68, 0.06);
+    }
+
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+        padding: 0.5rem 0;
+    }
+
+    .page-btn {
+        min-width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text-main);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        font-size: 0.85rem;
+        font-family: inherit;
+    }
+
+    .page-btn:hover:not(:disabled):not(.active) {
+        background: var(--bg-light);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .page-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 2px 12px rgba(26, 86, 148, 0.25);
+    }
+
+    .page-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .page-btn.ellipsis {
+        border: none;
+        cursor: default;
+        background: transparent;
+        color: var(--text-dim);
+        min-width: 30px;
+    }
+
+    .page-btn.ellipsis:hover {
+        transform: none;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .pagination-info {
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        margin-top: 0.2rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .pagination-info strong {
+        color: var(--text-main);
+    }
+
+    .bulk-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background: rgba(239, 68, 68, 0.05);
+        border-top: 1px solid var(--border);
+        display: none;
+        flex-wrap: wrap;
+    }
+
+    .bulk-actions.show {
+        display: flex;
+    }
+
+    .bulk-actions .selected-count {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+    }
+
+    .bulk-actions .selected-count strong {
+        color: var(--text-main);
+    }
+
+    .btn-danger {
+        background: var(--danger);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+    }
+
+    .btn-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-success {
+        background: var(--success);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-sm {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .btn-outline-sm:hover {
+        background: var(--surface-light);
+        border-color: var(--primary);
+    }
+
+    .btn-outline-sm.success {
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    .btn-outline-sm.success:hover {
+        background: rgba(16, 185, 129, 0.1);
+    }
+
+    .btn-outline-sm.danger {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-outline-sm.danger:hover {
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .row-selector {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary);
+        flex-shrink: 0;
+    }
+
     .no-logs {
         text-align: center;
         padding: 4rem;
@@ -320,102 +543,462 @@
         opacity: 0.2;
     }
 
-    /* Photo Modal Styles */
-    .photo-modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        backdrop-filter: blur(10px);
-        z-index: 9999;
-        align-items: center;
-        justify-content: center;
-        animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-
-        to {
-            opacity: 1;
-        }
-    }
-
-    .photo-modal {
-        position: relative;
-        max-width: 90%;
-        max-height: 90%;
+    .logs-actions {
         display: flex;
-        flex-direction: column;
+        gap: 0.5rem;
         align-items: center;
-        animation: zoomIn 0.3s ease;
+        flex-wrap: wrap;
     }
 
-    @keyframes zoomIn {
-        from {
-            transform: scale(0.9);
-            opacity: 0;
-        }
-
-        to {
-            transform: scale(1);
-            opacity: 1;
-        }
+    .msg.verification {
+        background: #fffbeb;
+        border: 1px solid var(--warning);
+        border-left: 4px solid var(--warning);
+        min-width: 400px;
+        cursor: default;
+        color: var(--text-main);
     }
 
-    .modal-photo {
-        max-width: 100%;
-        max-height: 80vh;
-        border-radius: 20px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-        object-fit: contain;
-        background: #000;
+    .msg.verification .msg-content {
+        flex: 1;
     }
 
-    .modal-close {
-        position: absolute;
-        top: -40px;
-        right: -40px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+    .msg.verification .msg-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        color: #92400e;
+    }
+
+    .msg.verification .msg-text {
+        font-size: 0.85rem;
+        color: #78350f;
+        line-height: 1.4;
+    }
+
+    .msg-actions {
+        margin-top: 10px;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .msg-btn {
+        padding: 6px 16px;
+        border: none;
+        border-radius: 6px;
         cursor: pointer;
-        font-size: 1.2rem;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(5px);
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    .modal-close:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: rotate(90deg);
-    }
-
-    .modal-info {
-        margin-top: 20px;
-        text-align: center;
+    .msg-btn-success {
+        background: var(--success);
         color: white;
     }
 
-    .modal-info h3 {
-        font-size: 1.2rem;
-        margin-bottom: 5px;
+    .msg-btn-success:hover {
+        background: #059669;
+        transform: scale(1.02);
+    }
+
+    .msg-btn-danger {
+        background: var(--danger);
         color: white;
     }
 
-    .modal-info p {
+    .msg-btn-danger:hover {
+        background: #dc2626;
+        transform: scale(1.02);
+    }
+
+    .msg-btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
         color: var(--text-dim);
-        font-size: 0.9rem;
+    }
+
+    .msg-btn-outline:hover {
+        background: var(--surface-light);
+        border-color: var(--primary);
+    }
+
+    @media (max-width: 1024px) {
+        .filter-container {
+            gap: 10px;
+        }
+        .search-box {
+            min-width: 180px;
+        }
+        .filter-dropdown {
+            min-width: 140px;
+        }
+        th, td {
+            padding: 14px 16px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .filter-container {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+        .search-box {
+            width: 100%;
+            min-width: unset;
+        }
+        .filter-dropdown {
+            min-width: unset;
+            width: 100%;
+        }
+        .clear-filters {
+            justify-content: center;
+            padding: 10px 16px;
+            font-size: 0.8rem;
+        }
+        .top-intro {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .top-intro h2 {
+            font-size: 1.3rem;
+        }
+        .pagination-wrapper {
+            gap: 0.3rem;
+        }
+        .page-btn {
+            min-width: 34px;
+            height: 34px;
+            font-size: 0.75rem;
+        }
+        .pagination-info {
+            font-size: 0.8rem;
+        }
+        .bulk-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            padding: 0.75rem 1rem;
+        }
+        .bulk-actions .selected-count {
+            text-align: center;
+        }
+        .bulk-actions .btn-danger,
+        .bulk-actions .btn-success,
+        .bulk-actions .btn-outline-sm {
+            justify-content: center;
+            width: 100%;
+        }
+        .logs-actions {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .logs-actions .btn-outline-sm {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+        }
+        .table-wrapper {
+            margin: 0 -1rem;
+            padding: 0 1rem;
+        }
+        table {
+            font-size: 0.8rem;
+            min-width: 700px;
+        }
+        th, td {
+            padding: 10px 12px;
+        }
+        .details-text {
+            max-width: 120px;
+        }
+        .user-badge {
+            min-width: 80px;
+        }
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.7rem;
+        }
+        .timestamp-col {
+            font-size: 0.7rem;
+        }
+        .status-badge {
+            font-size: 0.55rem;
+            padding: 3px 8px;
+        }
+        .action-badge {
+            font-size: 0.65rem;
+            padding: 4px 8px;
+        }
+        .ip-badge {
+            font-size: 0.65rem;
+        }
+        .msg.verification {
+            min-width: unset;
+            width: 100%;
+            max-width: 95vw;
+            padding: 14px 16px;
+        }
+        .msg-actions {
+            flex-direction: column;
+        }
+        .msg-btn {
+            justify-content: center;
+            padding: 8px 12px;
+            width: 100%;
+        }
+        .filter-tags {
+            justify-content: center;
+        }
+        .filter-tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .top-intro {
+            gap: 10px;
+        }
+        .top-intro h2 {
+            font-size: 1.1rem;
+        }
+        .top-intro p {
+            font-size: 0.8rem;
+        }
+        .filter-container {
+            gap: 8px;
+        }
+        .search-box input {
+            padding: 10px 12px 10px 38px;
+            font-size: 0.8rem;
+        }
+        .search-box i {
+            left: 12px;
+            font-size: 0.8rem;
+        }
+        .filter-select {
+            padding: 10px 35px 10px 12px;
+            font-size: 0.8rem;
+        }
+        .filter-dropdown i {
+            right: 12px;
+            font-size: 0.8rem;
+        }
+        .clear-filters {
+            padding: 8px 14px;
+            font-size: 0.75rem;
+        }
+        table {
+            font-size: 0.7rem;
+            min-width: 600px;
+        }
+        th, td {
+            padding: 8px 8px;
+        }
+        th {
+            font-size: 0.6rem;
+            padding: 10px 8px;
+        }
+        .details-text {
+            max-width: 80px;
+            font-size: 0.7rem;
+        }
+        .user-badge {
+            min-width: 60px;
+            gap: 6px;
+        }
+        .user-avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 0.6rem;
+        }
+        .user-badge strong {
+            font-size: 0.7rem;
+        }
+        .timestamp-col {
+            font-size: 0.6rem;
+        }
+        .timestamp-date {
+            font-size: 0.65rem;
+        }
+        .timestamp-time {
+            font-size: 0.55rem;
+        }
+        .status-badge {
+            font-size: 0.5rem;
+            padding: 2px 6px;
+        }
+        .action-badge {
+            font-size: 0.55rem;
+            padding: 3px 6px;
+        }
+        .ip-badge {
+            font-size: 0.55rem;
+        }
+        .logs-actions .btn-outline-sm {
+            padding: 3px 6px;
+            font-size: 0.6rem;
+        }
+        .logs-actions .btn-outline-sm i {
+            font-size: 0.6rem;
+        }
+        .pagination-wrapper {
+            gap: 0.2rem;
+        }
+        .page-btn {
+            min-width: 30px;
+            height: 30px;
+            font-size: 0.65rem;
+            border-radius: 8px;
+        }
+        .pagination-info {
+            font-size: 0.7rem;
+        }
+        .bulk-actions {
+            padding: 0.5rem 0.75rem;
+            gap: 6px;
+        }
+        .bulk-actions .btn-danger,
+        .bulk-actions .btn-success {
+            font-size: 0.7rem;
+            padding: 6px 10px;
+        }
+        .bulk-actions .selected-count {
+            font-size: 0.7rem;
+        }
+        .bulk-actions .btn-outline-sm {
+            font-size: 0.7rem;
+            padding: 6px 10px;
+        }
+        .no-logs {
+            padding: 2rem;
+        }
+        .no-logs i {
+            font-size: 2rem;
+        }
+        .no-logs p {
+            font-size: 0.8rem;
+        }
+        .msg.verification {
+            padding: 12px 14px;
+        }
+        .msg.verification .msg-title {
+            font-size: 0.85rem;
+        }
+        .msg.verification .msg-text {
+            font-size: 0.8rem;
+        }
+        .msg-btn {
+            font-size: 0.75rem;
+            padding: 6px 10px;
+        }
+        .filter-tags {
+            gap: 4px;
+        }
+        .filter-tag {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+        }
+        .filter-tag i {
+            font-size: 0.6rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        table {
+            min-width: 500px;
+        }
+        th, td {
+            padding: 6px 6px;
+        }
+        .user-avatar {
+            width: 20px;
+            height: 20px;
+            font-size: 0.5rem;
+        }
+        .details-text {
+            max-width: 60px;
+        }
+        .logs-actions .btn-outline-sm {
+            padding: 2px 4px;
+            font-size: 0.5rem;
+        }
+        .logs-actions .btn-outline-sm i {
+            font-size: 0.5rem;
+        }
+        .status-badge {
+            font-size: 0.45rem;
+            padding: 2px 4px;
+        }
+        .action-badge {
+            font-size: 0.5rem;
+            padding: 2px 4px;
+        }
+        .ip-badge {
+            font-size: 0.5rem;
+        }
+        .page-btn {
+            min-width: 26px;
+            height: 26px;
+            font-size: 0.55rem;
+            border-radius: 6px;
+        }
+        .bulk-actions .btn-danger,
+        .bulk-actions .btn-success {
+            font-size: 0.6rem;
+            padding: 4px 8px;
+        }
+    }
+
+    @media print {
+        .filter-container,
+        .filter-tags,
+        .bulk-actions,
+        .pagination-wrapper,
+        .pagination-info,
+        .logs-actions,
+        .row-selector {
+            display: none !important;
+        }
+        .logs-panel {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        th {
+            background: #f5f5f5;
+            color: #333;
+        }
+        td {
+            border-bottom: 1px solid #eee;
+        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .msg.verification {
+            background: #2d1f00;
+            border-color: #8b6914;
+        }
+        .msg.verification .msg-title {
+            color: #fbbf24;
+        }
+        .msg.verification .msg-text {
+            color: #d4a373;
+        }
+        .tr-archived {
+            background: rgba(239, 68, 68, 0.08);
+        }
+        .tr-archived:hover {
+            background: rgba(239, 68, 68, 0.12);
+        }
     }
 </style>
 {% endblock %}
@@ -431,8 +1014,7 @@
 <div class="filter-container">
     <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="logSearch" placeholder="Search by user, action, or details..."
-            value="{{ request.GET.q|default:'' }}">
+        <input type="text" id="logSearch" placeholder="Search by user, action, or details...">
     </div>
 
     <div class="filter-dropdown">
@@ -443,135 +1025,212 @@
             <option value="update">Update</option>
             <option value="delete">Delete</option>
             <option value="login">Login</option>
+            <option value="logout">Logout</option>
+        </select>
+    </div>
+
+    <div class="filter-dropdown">
+        <i class="fas fa-filter"></i>
+        <select id="statusFilter" class="filter-select" style="background: var(--text-dim);">
+            <option value="active" selected>Active Logs</option>
+            <option value="archived">Archived Logs</option>
+            {% if request.user.is_superuser %}
+            <option value="all">All Logs</option>
+            {% endif %}
         </select>
     </div>
 
     <button id="clearFilters" class="clear-filters">
         <i class="fas fa-times-circle"></i> Clear Filters
     </button>
-
-    <div class="results-count" id="resultsCount">
-        Showing <strong id="visibleCount">{{ logs|length }}</strong> of <strong>{{ logs|length }}</strong> log entries
-    </div>
 </div>
 
 <div class="filter-tags" id="filterTags"></div>
 
 <div class="logs-panel">
-    <table>
-        <thead>
-            <tr>
-                <th>TIMESTAMP</th>
-                <th>USER</th>
-                <th>ACTION</th>
-                <th>DETAILS</th>
-                <th>IP ADDRESS</th>
-            </tr>
-        </thead>
-        <tbody id="logsTableBody">
-            {% for log in logs %}
-            <tr data-log-id="{{ log.id }}">
-                <td class="timestamp-col">
-                    <span class="timestamp-date">{{ log.timestamp|date:"M d, Y" }}</span>
-                    <span class="timestamp-time">{{ log.timestamp|date:"h:i:s A" }}</span>
-                </td>
-                <td>
-                    {% if log.user %}
-                    <div class="user-badge">
-                        {% with staff_profile=log.user.staffprofile %}
-                        {% if staff_profile and staff_profile.photo %}
-                        <img src="{{ staff_profile.photo.url }}" class="user-avatar" alt="{{ log.user.username }}"
-                            onclick="openUserPhotoModal('{{ staff_profile.photo.url }}', '{{ log.user.get_full_name|default:log.user.username|title }}', '{{ log.user.email }}')"
-                            title="Click to view full size">
-                        {% elif log.user.staff and log.user.staff.photo %}
-                        <img src="{{ log.user.staff.photo.url }}" class="user-avatar" alt="{{ log.user.username }}"
-                            onclick="openUserPhotoModal('{{ log.user.staff.photo.url }}', '{{ log.user.get_full_name|default:log.user.username|title }}', '{{ log.user.email }}')"
-                            title="Click to view full size">
-                        {% elif log.user.profile and log.user.profile.photo %}
-                        <img src="{{ log.user.profile.photo.url }}" class="user-avatar" alt="{{ log.user.username }}"
-                            onclick="openUserPhotoModal('{{ log.user.profile.photo.url }}', '{{ log.user.get_full_name|default:log.user.username|title }}', '{{ log.user.email }}')"
-                            title="Click to view full size">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" id="selectAll" class="row-selector" title="Select all logs">
+                    </th>
+                    <th>TIMESTAMP</th>
+                    <th>USER</th>
+                    <th>ACTION</th>
+                    <th>DETAILS</th>
+                    <th>IP ADDRESS</th>
+                    <th>STATUS</th>
+                    <th style="width: 150px;">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody id="logsTableBody">
+                {% for log in page_obj %}
+                <tr data-log-id="{{ log.id }}" data-log-deleted="{{ log.is_deleted|yesno:'true,false' }}" data-action="{{ log.action|lower }}" class="{% if log.is_deleted %}tr-archived{% endif %}">
+                    <td>
+                        <input type="checkbox" class="row-selector log-selector" data-log-id="{{ log.id }}" {% if log.is_deleted %}disabled{% endif %}>
+                    </td>
+                    <td class="timestamp-col">
+                        <span class="timestamp-date">{{ log.timestamp|date:"M d, Y" }}</span>
+                        <span class="timestamp-time">{{ log.timestamp|date:"h:i:s A" }}</span>
+                    </td>
+                    <td>
+                        {% if log.user %}
+                        <div class="user-badge">
+                            <div class="user-avatar" style="background: var(--primary); cursor: pointer;"
+                                onclick="openUserPhotoModal('https://ui-avatars.com/api/?name={{ log.user.username }}&background=0062ff&color=fff', '{{ log.user.get_full_name|default:log.user.username|title }}', '{{ log.user.email }}')"
+                                title="Click to view full size">
+                                {{ log.user.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <strong>{{ log.user.get_full_name|default:log.user.username|title }}</strong>
+                                {% if log.user.is_superuser %}
+                                <span style="display: block; font-size: 0.7rem; color: var(--primary);">
+                                    <i class="fas fa-shield-alt"></i> Admin
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
                         {% else %}
-                        <div class="user-avatar" style="background: var(--primary); cursor: pointer;"
-                            onclick="openUserPhotoModal('https://ui-avatars.com/api/?name={{ log.user.username }}&background=0062ff&color=fff', '{{ log.user.get_full_name|default:log.user.username|title }}', '{{ log.user.email }}')"
-                            title="Click to view full size">
-                            {{ log.user.username|slice:":1"|upper }}
+                        <div class="user-badge">
+                            <div class="user-avatar" style="background: var(--surface-light);">
+                                <i class="fas fa-user-slash" style="color: var(--text-dim);"></i>
+                            </div>
+                            <div>
+                                <span class="deleted-user">Deleted User</span>
+                                {% if log.deleted_username %}
+                                <span style="display: block; font-size: 0.7rem; color: var(--text-dim);">
+                                    ({{ log.deleted_username }})
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
                         {% endif %}
-                        {% endwith %}
-                        <div>
-                            <strong>{{ log.user.get_full_name|default:log.user.username|title }}</strong>
-                            {% if log.user.is_superuser %}
-                            <span style="display: block; font-size: 0.7rem; color: var(--primary);">
-                                <i class="fas fa-shield-alt"></i> Admin
-                            </span>
+                    </td>
+                    <td>
+                        {% if 'Delete' in log.action or 'delete' in log.action|lower %}
+                        <span class="action-badge delete">{{ log.action }}</span>
+                        {% elif 'Create' in log.action or 'Add' in log.action or 'create' in log.action|lower or 'add' in log.action|lower %}
+                        <span class="action-badge create">{{ log.action }}</span>
+                        {% elif 'Update' in log.action or 'Edit' in log.action or 'update' in log.action|lower or 'edit' in log.action|lower %}
+                        <span class="action-badge update">{{ log.action }}</span>
+                        {% elif 'Login' in log.action or 'login' in log.action|lower %}
+                        <span class="action-badge login">{{ log.action }}</span>
+                        {% else %}
+                        <span class="action-badge default">{{ log.action }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="details-text">{{ log.details }}</div>
+                    </td>
+                    <td>
+                        <span class="ip-badge {% if '::1' in log.ip_address or '127.0.0.1' in log.ip_address or 'localhost' in log.ip_address|lower %}ip-local{% else %}ip-public{% endif %}">
+                            {{ log.ip_address|default:"0.0.0.0" }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge {% if log.is_deleted %}archived{% else %}active{% endif %}">
+                            {% if log.is_deleted %}Archived{% else %}Active{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="logs-actions">
+                            {% if not log.is_deleted %}
+                            <button class="btn-outline-sm danger" onclick="archiveLog({{ log.id }})" title="Archive this log">
+                                <i class="fas fa-archive"></i>
+                            </button>
+                            {% else %}
+                            <button class="btn-outline-sm success" onclick="restoreLog({{ log.id }})" title="Restore this log">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                            {% endif %}
+                            {% if request.user.is_superuser and log.is_deleted %}
+                            <button class="btn-outline-sm danger" onclick="permanentDeleteLog({{ log.id }})" title="Permanently delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                             {% endif %}
                         </div>
-                    </div>
-                    {% else %}
-                    <div class="user-badge">
-                        <div class="user-avatar" style="background: var(--surface-light);">
-                            <i class="fas fa-user-slash" style="color: var(--text-dim);"></i>
-                        </div>
-                        <div>
-                            <span class="deleted-user">Deleted User</span>
-                            {% if log.deleted_username %}
-                            <span style="display: block; font-size: 0.7rem; color: var(--text-dim);">
-                                ({{ log.deleted_username }})
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if 'Delete' in log.action or 'delete' in log.action|lower %}
-                    <span class="action-badge delete">{{ log.action }}</span>
-                    {% elif 'Create' in log.action or 'Add' in log.action or 'create' in log.action|lower or 'add' in
-                    log.action|lower %}
-                    <span class="action-badge create">{{ log.action }}</span>
-                    {% elif 'Update' in log.action or 'Edit' in log.action or 'update' in log.action|lower or 'edit' in
-                    log.action|lower %}
-                    <span class="action-badge update">{{ log.action }}</span>
-                    {% elif 'Login' in log.action or 'login' in log.action|lower %}
-                    <span class="action-badge login">{{ log.action }}</span>
-                    {% else %}
-                    <span class="action-badge default">{{ log.action }}</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="details-text">
-                        {{ log.details }}
-                    </div>
-                </td>
-                <td>
-                    <span
-                        class="ip-badge {% if '::1' in log.ip_address or '127.0.0.1' in log.ip_address or 'localhost' in log.ip_address|lower %}ip-local{% else %}ip-public{% endif %}">
-                        {{ log.ip_address|default:"0.0.0.0" }}
-                    </span>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="no-logs">
-                    <i class="fas fa-history"></i>
-                    <p>No system logs found.</p>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="no-logs">
+                        <i class="fas fa-history"></i>
+                        <p>No system logs found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bulk-actions" id="bulkActions">
+        <div class="selected-count">
+            <strong id="selectedCount">0</strong> log(s) selected
+        </div>
+        <button class="btn-danger" id="deleteSelectedBtn" onclick="bulkArchiveLogs()">
+            <i class="fas fa-archive"></i> Archive Selected
+        </button>
+        <button class="btn-success" id="restoreSelectedBtn" onclick="bulkRestoreLogs()" style="display:none;">
+            <i class="fas fa-undo"></i> Restore Selected
+        </button>
+        {% if request.user.is_superuser %}
+        <button class="btn-danger" id="permanentDeleteSelectedBtn" onclick="bulkPermanentDeleteLogs()" style="display:none;">
+            <i class="fas fa-trash-alt"></i> Permanently Delete
+        </button>
+        {% endif %}
+        <button class="btn-outline-sm" onclick="clearSelection()">Cancel</button>
+    </div>
 </div>
 
-<!-- Photo Modal -->
+<div class="pagination-wrapper" id="paginationContainer">
+    {% if page_obj.has_previous %}
+    <button class="page-btn" onclick="goToPage({{ page_obj.previous_page_number }})" title="Previous page">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    {% else %}
+    <button class="page-btn" disabled title="No previous page">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+        <button class="page-btn active" title="Current page {{ num }}">{{ num }}</button>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <button class="page-btn" onclick="goToPage({{ num }})" title="Go to page {{ num }}">{{ num }}</button>
+        {% elif num == page_obj.number|add:'3' and num < page_obj.paginator.num_pages %}
+        <span class="page-btn ellipsis">…</span>
+        {% elif num == page_obj.number|add:'-3' and num > 1 %}
+        <span class="page-btn ellipsis">…</span>
+        {% elif num == page_obj.paginator.num_pages and num > page_obj.number|add:'2' %}
+        <button class="page-btn" onclick="goToPage({{ num }})" title="Go to last page">{{ num }}</button>
+        {% elif num == 1 and num < page_obj.number|add:'-2' %}
+        <button class="page-btn" onclick="goToPage(1)" title="Go to first page">1</button>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <button class="page-btn" onclick="goToPage({{ page_obj.next_page_number }})" title="Next page">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+    {% else %}
+    <button class="page-btn" disabled title="No next page">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+    {% endif %}
+</div>
+
+<div class="pagination-info">
+    Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ total_logs }}</strong> entries
+</div>
+
 <div id="photoModal" class="photo-modal-overlay" onclick="closePhotoModal(event)">
     <div class="photo-modal" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="closePhotoModal()">
             <i class="fas fa-times"></i>
         </button>
-
         <img id="modalPhoto" class="modal-photo" alt="User Photo">
-
         <div class="modal-info">
             <h3 id="modalName"></h3>
             <p id="modalEmail"></p>
@@ -583,57 +1242,69 @@
 {% block extra_scripts %}
 {{ block.super }}
 <script>
-    const searchInput = document.getElementById('logSearch');
-    const actionFilter = document.getElementById('actionFilter');
-    const clearFiltersBtn = document.getElementById('clearFilters');
-    const filterTags = document.getElementById('filterTags');
-    const visibleCount = document.getElementById('visibleCount');
-    const allRows = document.querySelectorAll('#logsTableBody tr');
+    let currentPage = {{ page_obj.number }};
+    let totalPages = {{ page_obj.paginator.num_pages }};
+    let isSuperuser = {{ request.user.is_superuser|yesno:"true,false" }};
 
-    const filterState = {
-        search: new URLSearchParams(window.location.search).get('q') || '',
-        action: 'all'
-    };
-
-    // Initialize search input with URL parameter
-    if (filterState.search) {
-        searchInput.value = filterState.search;
+    function goToPage(page) {
+        if (page < 1 || page > totalPages) return;
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
     }
 
-    searchInput.addEventListener('input', function () {
-        filterState.search = this.value.toLowerCase().trim();
-        applyFilters();
-        updateURL();
-    });
+    // ========== FILTER SYSTEM ==========
+    const searchInput = document.getElementById('logSearch');
+    const actionFilter = document.getElementById('actionFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const filterTags = document.getElementById('filterTags');
 
-    actionFilter.addEventListener('change', function () {
-        filterState.action = this.value;
-        applyFilters();
-        updateURL();
-    });
+    const filterState = {
+        search: '',
+        action: 'all',
+        status: 'active'
+    };
 
-    clearFiltersBtn.addEventListener('click', function () {
-        searchInput.value = '';
-        actionFilter.value = 'all';
-        filterState.search = '';
-        filterState.action = 'all';
-        applyFilters();
-        updateURL();
-    });
+    // ========== GET CURRENT ROWS ==========
+    function getRows() {
+        return document.querySelectorAll('#logsTableBody tr:not(.no-logs)');
+    }
 
+    // ========== APPLY FILTERS ==========
     function applyFilters() {
+        const rows = getRows();
         let visibleRows = 0;
 
-        allRows.forEach(row => {
-            if (row.cells.length < 5) return;
-
+        rows.forEach(row => {
+            const rowAction = row.getAttribute('data-action') || '';
+            const rowDeletedAttr = row.getAttribute('data-log-deleted') || 'false';
+            const rowDeleted = rowDeletedAttr === 'true';
             const rowText = row.textContent.toLowerCase();
-            const actionCell = row.cells[2].textContent.toLowerCase();
 
-            let matchesSearch = !filterState.search || rowText.includes(filterState.search);
-            let matchesAction = filterState.action === 'all' || actionCell.includes(filterState.action);
+            // Search filter
+            let matchesSearch = true;
+            if (filterState.search) {
+                matchesSearch = rowText.includes(filterState.search);
+            }
 
-            if (matchesSearch && matchesAction) {
+            // Action filter
+            let matchesAction = true;
+            if (filterState.action !== 'all') {
+                matchesAction = rowAction === filterState.action;
+            }
+
+            // Status filter
+            let matchesStatus = true;
+            if (filterState.status === 'active') {
+                matchesStatus = !rowDeleted;
+            } else if (filterState.status === 'archived') {
+                matchesStatus = rowDeleted;
+            } else if (filterState.status === 'all') {
+                matchesStatus = true;
+            }
+
+            if (matchesSearch && matchesAction && matchesStatus) {
                 row.style.display = '';
                 visibleRows++;
             } else {
@@ -641,10 +1312,25 @@
             }
         });
 
-        visibleCount.textContent = visibleRows;
+        // Show/hide no logs message
+        const noLogsRow = document.querySelector('#logsTableBody .no-logs');
+        if (noLogsRow) {
+            noLogsRow.style.display = visibleRows === 0 ? '' : 'none';
+            if (visibleRows === 0 && noLogsRow.querySelector('p')) {
+                let message = 'No logs match your filters.';
+                if (filterState.search) message += ` (Search: "${filterState.search}")`;
+                if (filterState.action !== 'all') message += ` (Action: ${filterState.action})`;
+                if (filterState.status !== 'all') message += ` (Status: ${filterState.status})`;
+                noLogsRow.querySelector('p').textContent = message;
+            }
+        }
+
         updateFilterTags();
+        updateSelectAllState();
+        updateBulkActions();
     }
 
+    // ========== UPDATE FILTER TAGS ==========
     function updateFilterTags() {
         filterTags.innerHTML = '';
 
@@ -653,12 +1339,19 @@
         }
 
         if (filterState.action !== 'all') {
-            filterTags.appendChild(createFilterTag('action', `Action: ${filterState.action.charAt(0).toUpperCase() + filterState.action.slice(1)}`));
+            const actionName = actionFilter.options[actionFilter.selectedIndex]?.text || filterState.action;
+            filterTags.appendChild(createFilterTag('action', `Action: ${actionName}`));
+        }
+
+        if (filterState.status !== 'active') {
+            const statusName = statusFilter.options[statusFilter.selectedIndex]?.text || filterState.status;
+            filterTags.appendChild(createFilterTag('status', `Status: ${statusName}`));
         }
 
         filterTags.style.display = filterTags.children.length > 0 ? 'flex' : 'none';
     }
 
+    // ========== CREATE FILTER TAG ==========
     function createFilterTag(type, text) {
         const tag = document.createElement('div');
         tag.className = 'filter-tag active';
@@ -666,61 +1359,589 @@
         return tag;
     }
 
+    // ========== REMOVE FILTER ==========
     function removeFilter(type) {
         if (type === 'search') {
             searchInput.value = '';
             filterState.search = '';
-        } else {
+        } else if (type === 'action') {
             actionFilter.value = 'all';
             filterState.action = 'all';
+        } else if (type === 'status') {
+            statusFilter.value = 'active';
+            filterState.status = 'active';
         }
         applyFilters();
-        updateURL();
     }
 
-    function updateURL() {
-        const url = new URL(window.location);
-        if (filterState.search) {
-            url.searchParams.set('q', filterState.search);
-        } else {
-            url.searchParams.delete('q');
+    // ========== EVENT LISTENERS ==========
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterState.search = this.value.trim().toLowerCase();
+            applyFilters();
+        }, 300);
+    });
+
+    actionFilter.addEventListener('change', function() {
+        filterState.action = this.value;
+        applyFilters();
+    });
+
+    statusFilter.addEventListener('change', function() {
+        filterState.status = this.value;
+        applyFilters();
+    });
+
+    clearFiltersBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        actionFilter.value = 'all';
+        statusFilter.value = 'active';
+        filterState.search = '';
+        filterState.action = 'all';
+        filterState.status = 'active';
+        applyFilters();
+    });
+
+    // ========== UPDATE SELECT ALL STATE ==========
+    function updateSelectAllState() {
+        const visibleCheckboxes = document.querySelectorAll('.log-selector:not(:disabled):not([style*="display: none"])');
+        const checkedCheckboxes = document.querySelectorAll('.log-selector:not(:disabled):checked:not([style*="display: none"])');
+        const selectAll = document.getElementById('selectAll');
+
+        if (selectAll) {
+            selectAll.checked = visibleCheckboxes.length > 0 && visibleCheckboxes.length === checkedCheckboxes.length;
         }
-        window.history.replaceState({}, '', url);
     }
 
-    // PHOTO MODAL FUNCTIONS
+    // ========== SELECT ALL / BULK ACTIONS ==========
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+
+    function updateBulkActions() {
+        const selected = document.querySelectorAll('.log-selector:checked:not(:disabled)');
+        const count = selected.length;
+        selectedCount.textContent = count;
+
+        const hasArchived = Array.from(selected).some(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'true';
+        });
+
+        const hasActive = Array.from(selected).some(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'false';
+        });
+
+        if (count > 0) {
+            bulkActions.classList.add('show');
+            document.getElementById('deleteSelectedBtn').style.display = hasActive ? 'inline-flex' : 'none';
+            document.getElementById('restoreSelectedBtn').style.display = hasArchived ? 'inline-flex' : 'none';
+            if (document.getElementById('permanentDeleteSelectedBtn')) {
+                document.getElementById('permanentDeleteSelectedBtn').style.display = hasArchived ? 'inline-flex' : 'none';
+            }
+        } else {
+            bulkActions.classList.remove('show');
+        }
+    }
+
+    selectAllCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        const visibleCheckboxes = document.querySelectorAll('.log-selector:not(:disabled):not([style*="display: none"])');
+        visibleCheckboxes.forEach(cb => {
+            cb.checked = isChecked;
+        });
+        updateBulkActions();
+        updateSelectAllState();
+    });
+
+    document.querySelectorAll('.log-selector').forEach(cb => {
+        cb.addEventListener('change', function() {
+            updateBulkActions();
+            updateSelectAllState();
+        });
+    });
+
+    function clearSelection() {
+        document.querySelectorAll('.log-selector').forEach(cb => cb.checked = false);
+        selectAllCheckbox.checked = false;
+        updateBulkActions();
+    }
+
+    // ========== TOAST FUNCTIONS ==========
+    function showToast(message, type) {
+        let container = document.getElementById('django-messages');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'msg-container';
+            container.id = 'django-messages';
+            document.body.appendChild(container);
+        }
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `msg ${type}`;
+        msgDiv.setAttribute('data-auto-dismiss', 'true');
+
+        const iconMap = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-circle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+
+        const icon = iconMap[type] || 'fa-info-circle';
+
+        msgDiv.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+        `;
+
+        container.appendChild(msgDiv);
+
+        setTimeout(() => {
+            if (msgDiv.parentNode) {
+                msgDiv.style.animation = 'slideUp 0.3s ease-out forwards';
+                setTimeout(() => {
+                    if (msgDiv.parentNode) {
+                        msgDiv.remove();
+                        if (container.children.length === 0) {
+                            container.remove();
+                        }
+                    }
+                }, 300);
+            }
+        }, 4000);
+    }
+
+    // ========== VERIFICATION TOAST ==========
+    function showVerificationToast(message, onConfirm, onCancel = null, confirmLabel = 'Confirm', cancelLabel = 'Cancel', isDanger = false) {
+        let container = document.getElementById('django-messages');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'msg-container';
+            container.id = 'django-messages';
+            document.body.appendChild(container);
+        }
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'msg verification';
+        msgDiv.setAttribute('data-auto-dismiss', 'false');
+        msgDiv.style.cursor = 'default';
+
+        const btnClass = isDanger ? 'msg-btn-danger' : 'msg-btn-success';
+
+        msgDiv.innerHTML = `
+            <i class="fas fa-question-circle" style="color: var(--warning); font-size: 1.2rem;"></i>
+            <div class="msg-content">
+                <div class="msg-title">${isDanger ? '⚠️ Confirm Deletion' : 'Confirm Action'}</div>
+                <div class="msg-text">${message}</div>
+                <div class="msg-actions">
+                    <button class="msg-btn ${btnClass}" id="confirmBtn">
+                        <i class="fas fa-check"></i> ${confirmLabel}
+                    </button>
+                    <button class="msg-btn msg-btn-outline" id="cancelBtn">
+                        <i class="fas fa-times"></i> ${cancelLabel}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(msgDiv);
+        
+        msgDiv._onConfirm = onConfirm;
+        msgDiv._onCancel = onCancel;
+        
+        msgDiv.querySelector('#confirmBtn').addEventListener('click', function() {
+            confirmVerification(msgDiv);
+        });
+        
+        msgDiv.querySelector('#cancelBtn').addEventListener('click', function() {
+            cancelVerification(msgDiv);
+        });
+    }
+
+    function confirmVerification(msgDiv) {
+        if (!msgDiv) {
+            msgDiv = document.querySelector('.msg.verification');
+        }
+        if (!msgDiv) return;
+        
+        const onConfirm = msgDiv._onConfirm;
+        
+        if (msgDiv.parentNode) {
+            msgDiv.remove();
+            const container = document.getElementById('django-messages');
+            if (container && container.children.length === 0) {
+                container.remove();
+            }
+        }
+        
+        if (typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    }
+
+    function cancelVerification(msgDiv) {
+        if (!msgDiv) {
+            msgDiv = document.querySelector('.msg.verification');
+        }
+        if (!msgDiv) return;
+        
+        const onCancel = msgDiv._onCancel;
+        
+        if (msgDiv.parentNode) {
+            msgDiv.remove();
+            const container = document.getElementById('django-messages');
+            if (container && container.children.length === 0) {
+                container.remove();
+            }
+        }
+        
+        if (typeof onCancel === 'function') {
+            onCancel();
+        } else {
+            showToast('Cancelled', 'info');
+        }
+    }
+
+    // ========== LOG ACTION FUNCTIONS ==========
+    function archiveLog(logId) {
+        showVerificationToast(
+            'Are you sure you want to archive this log? It can be restored later.',
+            function() { executeArchiveLog(logId); },
+            function() { showToast('Archive cancelled', 'info'); },
+            'Archive',
+            'Cancel',
+            false
+        );
+    }
+
+    function restoreLog(logId) {
+        showVerificationToast(
+            'Are you sure you want to restore this archived log? It will become active again.',
+            function() { executeRestoreLog(logId); },
+            function() { showToast('Restore cancelled', 'info'); },
+            'Restore',
+            'Cancel',
+            false
+        );
+    }
+
+    function permanentDeleteLog(logId) {
+        if (!isSuperuser) {
+            showToast('Only administrators can permanently delete logs', 'error');
+            return;
+        }
+        showVerificationToast(
+            '⚠️ WARNING: This will permanently delete this log! This action cannot be undone!',
+            function() { executePermanentDelete(logId); },
+            function() { showToast('Delete cancelled', 'info'); },
+            'Yes, Delete',
+            'Cancel',
+            true
+        );
+    }
+
+    // ========== BULK FUNCTIONS ==========
+    function bulkArchiveLogs() {
+        const selected = document.querySelectorAll('.log-selector:checked:not(:disabled)');
+        const activeSelected = Array.from(selected).filter(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'false';
+        });
+
+        if (activeSelected.length === 0) {
+            showToast('No active logs selected', 'info');
+            return;
+        }
+
+        showVerificationToast(
+            `Are you sure you want to archive ${activeSelected.length} log entries? They can be restored later.`,
+            function() { executeBulkArchive(); },
+            function() { showToast('Bulk archive cancelled', 'info'); },
+            `Archive ${activeSelected.length}`,
+            'Cancel',
+            false
+        );
+    }
+
+    function bulkRestoreLogs() {
+        const selected = document.querySelectorAll('.log-selector:checked:not(:disabled)');
+        const archivedSelected = Array.from(selected).filter(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'true';
+        });
+
+        if (archivedSelected.length === 0) {
+            showToast('No archived logs selected', 'info');
+            return;
+        }
+
+        showVerificationToast(
+            `Are you sure you want to restore ${archivedSelected.length} archived log entries?`,
+            function() { executeBulkRestore(); },
+            function() { showToast('Bulk restore cancelled', 'info'); },
+            `Restore ${archivedSelected.length}`,
+            'Cancel',
+            false
+        );
+    }
+
+    function bulkPermanentDeleteLogs() {
+        if (!isSuperuser) {
+            showToast('Only administrators can permanently delete logs', 'error');
+            return;
+        }
+
+        const selected = document.querySelectorAll('.log-selector:checked:not(:disabled)');
+        const archivedSelected = Array.from(selected).filter(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'true';
+        });
+
+        if (archivedSelected.length === 0) {
+            showToast('No archived logs selected', 'info');
+            return;
+        }
+
+        showVerificationToast(
+            `⚠️ WARNING: This will permanently delete ${archivedSelected.length} archived log entries! This action cannot be undone!`,
+            function() { executeBulkPermanentDelete(); },
+            function() { showToast('Bulk delete cancelled', 'info'); },
+            `Delete ${archivedSelected.length}`,
+            'Cancel',
+            true
+        );
+    }
+
+    // ========== EXECUTE ACTIONS ==========
+    function executeArchiveLog(logId) {
+        showToast('Archiving log...', 'info');
+        fetch(`/dashboard/api/soft-delete-log/${logId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reason: 'Archived by admin' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to archive log', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error archiving log', 'error');
+        });
+    }
+
+    function executeRestoreLog(logId) {
+        showToast('Restoring log...', 'info');
+        fetch(`/dashboard/api/restore-log/${logId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to restore log', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error restoring log', 'error');
+        });
+    }
+
+    function executePermanentDelete(logId) {
+        showToast('Permanently deleting log...', 'info');
+        fetch(`/dashboard/api/permanent-delete-log/${logId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'warning');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to delete log', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error deleting log', 'error');
+        });
+    }
+
+    function executeBulkArchive() {
+        const selected = document.querySelectorAll('.log-selector:checked:not(:disabled)');
+        const activeSelected = Array.from(selected).filter(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'false';
+        });
+        const logIds = Array.from(activeSelected).map(cb => parseInt(cb.getAttribute('data-log-id')));
+
+        showToast(`Archiving ${logIds.length} logs...`, 'info');
+        fetch('/dashboard/api/bulk-soft-delete-logs/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ log_ids: logIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to archive logs', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error archiving logs', 'error');
+        });
+    }
+
+    function executeBulkRestore() {
+        const selected = document.querySelectorAll('.log-selector:checked:not(:disabled)');
+        const archivedSelected = Array.from(selected).filter(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'true';
+        });
+        const logIds = Array.from(archivedSelected).map(cb => parseInt(cb.getAttribute('data-log-id')));
+
+        showToast(`Restoring ${logIds.length} logs...`, 'info');
+        fetch('/dashboard/api/bulk-restore-logs/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ log_ids: logIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to restore logs', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error restoring logs', 'error');
+        });
+    }
+
+    function executeBulkPermanentDelete() {
+        const selected = document.querySelectorAll('.log-selector:checked:not(:disabled)');
+        const archivedSelected = Array.from(selected).filter(cb => {
+            const row = cb.closest('tr');
+            return row && row.dataset.logDeleted === 'true';
+        });
+        const logIds = Array.from(archivedSelected).map(cb => parseInt(cb.getAttribute('data-log-id')));
+
+        showToast(`Permanently deleting ${logIds.length} logs...`, 'info');
+        let deleted = 0, failed = 0;
+        const promises = logIds.map(id => {
+            return fetch(`/dashboard/api/permanent-delete-log/${id}/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) deleted++;
+                else failed++;
+            });
+        });
+        Promise.all(promises).then(() => {
+            if (deleted > 0) {
+                showToast(`${deleted} logs permanently deleted${failed > 0 ? `, ${failed} failed` : ''}`, 'warning');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast('Failed to delete logs', 'error');
+            }
+        });
+    }
+
+    // ========== PHOTO MODAL ==========
     function openUserPhotoModal(photoUrl, userName, userEmail) {
         const modal = document.getElementById('photoModal');
-        const modalPhoto = document.getElementById('modalPhoto');
-        const modalName = document.getElementById('modalName');
-        const modalEmail = document.getElementById('modalEmail');
-
-        modalPhoto.src = photoUrl;
-        modalName.textContent = userName;
-        modalEmail.textContent = userEmail;
-
+        document.getElementById('modalPhoto').src = photoUrl;
+        document.getElementById('modalName').textContent = userName;
+        document.getElementById('modalEmail').textContent = userEmail;
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 
     function closePhotoModal(event = null) {
-        if (event && event.target.id !== 'photoModal' && !event.target.classList.contains('modal-close')) {
-            return;
-        }
-
-        const modal = document.getElementById('photoModal');
-        modal.style.display = 'none';
+        if (event && event.target.id !== 'photoModal' && !event.target.classList.contains('modal-close')) return;
+        document.getElementById('photoModal').style.display = 'none';
         document.body.style.overflow = 'auto';
     }
 
-    // Close modal with Escape key
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            closePhotoModal();
+    function getCookie(name) {
+        let value = null;
+        if (document.cookie) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    value = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return value;
+    }
+
+    // ========== KEYBOARD SHORTCUTS ==========
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') closePhotoModal();
+        if (event.key === 'r' && !event.ctrlKey && !event.metaKey) {
+            event.preventDefault();
+            window.location.reload();
         }
     });
 
-    // Initialize filters
-    applyFilters();
+    // ========== INITIALIZE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('q');
+        const actionParam = urlParams.get('action');
+        const statusParam = urlParams.get('status');
+
+        if (searchParam) {
+            searchInput.value = searchParam;
+            filterState.search = searchParam.toLowerCase();
+        }
+        if (actionParam) {
+            actionFilter.value = actionParam;
+            filterState.action = actionParam;
+        }
+        if (statusParam) {
+            statusFilter.value = statusParam;
+            filterState.status = statusParam;
+        }
+
+        applyFilters();
+        updateBulkActions();
+    });
 </script>
 {% endblock %}

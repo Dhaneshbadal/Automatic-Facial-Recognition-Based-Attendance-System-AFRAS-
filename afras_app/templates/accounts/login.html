@@ -5,33 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AFRAS | Secure Login</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* Your existing CSS remains the same */
-        :root {
-            --primary: #0062ff;
+        
+         :root {
+            --primary: #1a5694;
             --primary-glow: rgba(0, 98, 255, 0.4);
-           --bg: #f0f2f5;
+            --bg: #f0f2f5;
             --surface: #111827;
-            --border: rgba(255, 255, 255, 0.1);
-            --text-main: #f9fafb;
+            --border: #93b3dd;
+            --text-main: #34395e;
             --text-dim: #9ca3af;
             --success: #10b981;
             --error: #ef4444;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            background-color: var(--bg);
+            background: rgba(3, 7, 18, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
             color: var(--text-main);
             font-family: 'Plus Jakarta Sans', sans-serif;
             height: 100vh;
@@ -40,58 +41,60 @@
             justify-content: center;
             overflow: hidden;
         }
-
+        
         .grid-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: -1;
-            opacity: 0.1;
+            background: rgba(3, 7, 18, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
         }
-
+        
         .login-card {
             width: 100%;
             max-width: 420px;
+            height: 570px;
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 3rem;
+            padding: 2rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             position: relative;
         }
-
+        
         .login-header {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 1rem;
         }
-
+        
         .login-header i {
             font-size: 2.5rem;
             color: var(--primary);
-            margin-bottom: 1rem;
         }
-
+        
         .login-header h2 {
             font-size: 1.75rem;
             font-weight: 800;
             letter-spacing: -1px;
         }
-
+        
         .login-header p {
             color: var(--text-dim);
             font-size: 0.85rem;
             margin-top: 5px;
         }
-
+        
         .msg-container {
             margin-bottom: 1.5rem;
         }
-
+        
         .msg {
             padding: 12px 16px;
             border-radius: 12px;
@@ -102,23 +105,23 @@
             border: 1px solid transparent;
             font-weight: 500;
         }
-
+        
         .msg.success {
             background: rgba(16, 185, 129, 0.1);
             color: var(--success);
             border-color: rgba(16, 185, 129, 0.2);
         }
-
+        
         .msg.error {
             background: rgba(239, 68, 68, 0.1);
             color: var(--error);
             border-color: rgba(239, 68, 68, 0.2);
         }
-
+        
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
-
+        
         .form-group label {
             display: block;
             font-size: 0.8rem;
@@ -127,38 +130,37 @@
             margin-bottom: 0.5rem;
             font-family: 'JetBrains Mono', monospace;
         }
-
+        
         .input-wrapper {
             position: relative;
         }
-
+        
         .input-wrapper i {
             position: absolute;
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-dim);
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
-
+        
         input {
             width: 100%;
             padding: 14px 14px 14px 45px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            color: white;
+            color: var(--text-main);
             font-size: 1rem;
             transition: 0.3s;
         }
-
+        
         input:focus {
-            outline: none;
             border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.07);
-            box-shadow: 0 0 15px var(--primary-glow);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 2px rgba(0, 98, 255, 0.2);
         }
-
+        
         .btn-login {
             width: 100%;
             padding: 16px;
@@ -173,42 +175,42 @@
             margin-top: 1rem;
             box-shadow: 0 10px 20px var(--primary-glow);
         }
-
+        
         .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 15px 30px var(--primary-glow);
         }
-
+        
         .footer-links {
             text-align: center;
-            margin-top: 2rem;
+            margin-top: 1rem;
             font-size: 0.85rem;
         }
-
+        
         .footer-links p {
             color: var(--text-dim);
             margin-bottom: 10px;
         }
-
+        
         .footer-links a {
             color: var(--primary);
             text-decoration: none;
             font-weight: 600;
         }
-
+        
         .login-actions {
             display: flex;
             justify-content: space-between;
             margin-top: 1rem;
             font-size: 0.85rem;
         }
-
+        
         .login-actions a {
             color: var(--primary);
             text-decoration: none;
             font-weight: 500;
         }
-
+        
         .login-actions a:hover {
             text-decoration: underline;
         }
@@ -231,11 +233,8 @@
             {% for msg in messages %}
             <div class="msg {{ msg.tags }}">
                 {% if msg.tags == 'success' %}
-                <i class="fas fa-check-circle"></i>
-                {% else %}
-                <i class="fas fa-exclamation-circle"></i>
-                {% endif %}
-                {{ msg }}
+                <i class="fas fa-check-circle"></i> {% else %}
+                <i class="fas fa-exclamation-circle"></i> {% endif %} {{ msg }}
             </div>
             {% endfor %}
         </div>
@@ -249,8 +248,7 @@
                 </label>
                 <div class="input-wrapper">
                     <i class="fas fa-user" style="color: var(--primary);"></i>
-                    <input type="text" name="username" placeholder="Username" required autocomplete="off"
-                        autocorrect="off" autocapitalize="off" spellcheck="false">
+                    <input type="text" name="username" placeholder="Username" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 </div>
             </div>
 
@@ -259,7 +257,7 @@
                     <span>SECURITY_KEY</span>
                 </label>
                 <div class="input-wrapper">
-                    <i class="fas fa-lock" style="color: yellow;"></i>
+                    <i class="lock lock-secure" style="color:#4CAF50; font-style: normal;">🔒</i>
                     <input type="password" name="password" placeholder="••••••••" required autocomplete="new-password">
                 </div>
             </div>
@@ -278,12 +276,10 @@
 
         <div class="footer-links">
             <p>Need system access?</p>
-            <a href="{% url 'register-student' %}"><i class="fas fa-user-plus"></i> Register Student</a>
-            {% if user.is_authenticated %}
+            <a href="{% url 'register-student' %}"><i class="fas fa-user-plus"></i> Register Student</a> {% if user.is_authenticated %}
             <span style="color: var(--success); margin-left: 15px;">
                 <i class="fas fa-check-circle"></i> Already logged in
-            </span>
-            {% endif %}
+            </span> {% endif %}
         </div>
     </div>
 
@@ -298,7 +294,7 @@
         }
 
         // Clear form on page load (optional, can be enabled if needed)
-        window.addEventListener('load', function () {
+        window.addEventListener('load', function() {
             // Only clear if we have no previous errors
             if (!document.querySelector('.msg.error')) {
                 clearForm();
@@ -307,7 +303,7 @@
 
         // Prevent browser autofill by adding fake hidden fields
         // This tricks browsers into thinking they've already filled the form
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Add a fake username field to confuse autofill
             const fakeUsername = document.createElement('input');
             fakeUsername.type = 'text';
@@ -339,7 +335,7 @@
         });
 
         // Handle browser back/forward navigation
-        window.addEventListener('pageshow', function (event) {
+        window.addEventListener('pageshow', function(event) {
             // If the page is loaded from cache (back/forward navigation)
             if (event.persisted) {
                 // Clear the form
